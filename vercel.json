@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://e2e-hrc-backend.onrender.com/api/$1"
+    }
+  ]
+}
