@@ -1,9 +1,9 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import HeroSection from '../components/becomepartner/HeroSection';
-import PartnerFormSection from '../components/becomepartner/PartnerFormSection';
-import BuiltOnTrustSection from '../components/becomepartner/BuiltOnTrustSection';
-import NetworkMapSection from '../components/becomepartner/NetworkMapSection';
+import HeroSection from '../components/becomePartner/HeroSection';
+import PartnerFormSection from '../components/becomePartner/PartnerFormSection';
+import BuiltOnTrustSection from '../components/becomePartner/BuiltOnTrustSection';
+import NetworkMapSection from '../components/becomePartner/NetworkMapSection';
 
 export default function BecomePartner() {
   return (
