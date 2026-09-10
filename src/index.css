@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Leaflet z-index overrides to prevent overlap with Navbar */
+.leaflet-container {
+  z-index: 1 !important;
+  position: relative;
+}
+
+.leaflet-pane {
+  z-index: 400 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400 !important;
+}
+
+.leaflet-control {
+  z-index: 400 !important;
+}
+
+.leaflet-control-container {
+  z-index: 400 !important;
+}
+
+.leaflet-popup {
+  z-index: 600 !important;
+}

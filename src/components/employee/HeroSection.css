@@ -1,0 +1,322 @@
+.hero-wrapper {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-scroll-wrap {
+  width: 100%;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 1439px) {
+  .hero-scroll-wrap {
+    justify-content: flex-start;
+  }
+}
+
+.hero-container {
+  position: relative;
+  width: 1440px;
+  height: 520px;
+  background: #FFFFFF;
+  overflow: hidden;
+  flex-shrink: 0;
+  transform-origin: top left;
+}
+
+/* --- Dashed Brackets (L-shaped corner brackets, behind hexagons) --- */
+
+.dash-bracket-left {
+  position: absolute;
+  top: 130px;
+  left: 0;
+  width: 220px;
+  height: 260px;
+  border-left: none;
+  border-top: none;
+  border-right: 2px dashed #F39308;
+  border-bottom: 2px dashed #F39308;
+  background: transparent;
+  z-index: 0;
+}
+
+.dash-bracket-right {
+  position: absolute;
+  top: 130px;
+  right: 40px;
+  width: 60px;
+  height: 350px;
+  border-right: none;
+  border-top: none;
+  border-left: 2px dashed #F39308;
+  border-bottom: 2px dashed #F39308;
+  background: transparent;
+  z-index: 0;
+}
+
+/* --- Gradient Hexagon Backgrounds (z-index: 1) --- */
+
+.hex-bg-1 {
+  position: absolute;
+  width: 182px;
+  height: 210px;
+  top: 42px;
+  left: 20px;
+  background: linear-gradient(135deg, #E9E4FF 0%, #CFE7FF 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: 1;
+}
+
+.hex-bg-2 {
+  position: absolute;
+  width: 290px;
+  height: 335px;
+  top: 185px;
+  left: 110px;
+  background: linear-gradient(135deg, #D9EDFF 0%, #BFD8FF 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: 1;
+}
+
+.hex-bg-3 {
+  position: absolute;
+  width: 290px;
+  height: 335px;
+  top: 42px;
+  left: 1170px;
+  background: linear-gradient(135deg, #FFE3A9 0%, #FFC04A 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: 1;
+}
+
+/* --- Hexagon Photo Images (z-index: 2) — soft blended edges --- */
+
+.hero-img-1,
+.hero-img-2,
+.hero-img-3 {
+  position: absolute;
+  object-fit: cover;
+  object-position: center center;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  mask-image: radial-gradient(ellipse at center, black 78%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 78%, transparent 100%);
+  z-index: 2;
+}
+
+.hero-img-1 {
+  width: 160px;
+  height: 188px;
+  top: 53px;
+  left: 31px;
+}
+
+.hero-img-2 {
+  width: 265px;
+  height: 310px;
+  top: 197.5px;
+  left: 122.5px;
+}
+
+.hero-img-3 {
+  width: 265px;
+  height: 310px;
+  top: 54.5px;
+  left: 1182.5px;
+}
+
+/* --- Solid Green & Gradient Hex Dots (z-index: 3) --- */
+
+.hex-dot {
+  position: absolute;
+  width: 40px;
+  height: 46px;
+  background: #C9DB82;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: 3;
+}
+
+.hex-dot-1 {
+  top: 250px;
+  left: 25px;
+}
+
+.hex-dot-2 {
+  top: 352px;
+  left: 25px;
+}
+
+.hex-dot-gradient {
+  position: absolute;
+  width: 36px;
+  height: 41.6px;
+  background: linear-gradient(49.52deg, #1295D4 -4.12%, #7EC443 85.04%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: 3;
+}
+
+.hex-dot-gradient-1 {
+  top: 470px;
+  left: 1338px;
+}
+
+.hex-dot-gradient-2 {
+  top: 470px;
+  left: 1386px;
+}
+
+/* --- Center Text Content (z-index: 4) --- */
+
+.hero-eyebrow {
+  position: absolute;
+  width: 294px;
+  height: 26px;
+  top: 100px;
+  left: 607px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 26px;
+  text-align: center;
+  color: #004CA5;
+  z-index: 4;
+}
+
+.hero-heading-wrap {
+  position: absolute;
+  width: 750px;
+  height: 180px;
+  top: 126px;
+  left: 364px;
+  padding-top: 19.4px;
+  padding-bottom: 30.6px;
+  box-sizing: border-box;
+  z-index: 4;
+}
+
+.hero-heading {
+  width: 750px;
+  height: 130px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 60px;
+  line-height: 65px;
+  letter-spacing: 2.5px;
+  text-align: center;
+  color: #2A343E;
+  margin: 0;
+}
+
+.hero-subtext {
+  position: absolute;
+  width: 565px;
+  height: 72px;
+  top: 299px;
+  left: 518px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 36px;
+  text-align: center;
+  color: #000000;
+  z-index: 4;
+}
+
+/* ===== MOBILE: Stacked layout for screens < 768px ===== */
+
+@media (max-width: 767px) {
+  .hero-wrapper {
+    overflow: visible;
+  }
+
+  .hero-scroll-wrap {
+    overflow: visible;
+    justify-content: center;
+  }
+
+  .hero-container {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 420px;
+    overflow: visible;
+    transform: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px 40px;
+  }
+
+  /* Hide all decorative elements on mobile */
+  .dash-bracket-left,
+  .dash-bracket-right,
+  .hex-bg-1,
+  .hex-bg-2,
+  .hex-bg-3,
+  .hero-img-1,
+  .hero-img-2,
+  .hero-img-3,
+  .hex-dot,
+  .hex-dot-gradient {
+    display: none !important;
+  }
+
+  /* Reposition text without absolute positioning */
+  .hero-eyebrow {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin-bottom: 8px;
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .hero-heading-wrap {
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+
+  .hero-heading {
+    width: 100%;
+    height: auto;
+    font-size: 32px;
+    line-height: 38px;
+    letter-spacing: 1px;
+  }
+
+  .hero-subtext {
+    position: static;
+    width: 100%;
+    height: auto;
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-container {
+    min-height: 350px;
+    padding: 60px 16px 30px;
+  }
+
+  .hero-heading {
+    font-size: 26px;
+    line-height: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  .hero-eyebrow {
+    font-size: 14px;
+  }
+
+  .hero-subtext {
+    font-size: 14px;
+    line-height: 22px;
+  }
+}

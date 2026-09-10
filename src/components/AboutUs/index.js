@@ -1,0 +1,9 @@
+export { default as AboutUsPage } from "./AboutUsPage";
+export { default as Hero } from "./Hero";
+export { default as WhoWeAre } from "./WhoWeAre";
+export { default as BridgingGap } from "./BridgingGap";
+export { default as WhyChooseUs } from "./WhyChooseUs";
+export { default as MissionVision } from "./MissionVision";
+export { default as Testimonials } from "./Testimonials";
+export { default as GlobalFootprint } from "./GlobalFootprint";
+export { default as CallToAction } from "./CallToAction";

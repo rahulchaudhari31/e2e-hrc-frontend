@@ -1,0 +1,295 @@
+/* ─────────────────────────────────────────
+   Page-level wrapper — positions section
+   exactly at top: 129px on a 1440 canvas
+───────────────────────────────────────── */
+.sectionWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: #ffffff;
+}
+
+/* ─────────────────────────────────────────
+   Section  — Figma frame
+   width: 1440 | height: 626 | top: 129
+   padding: 4px 64px 40px 64px
+   gap: 64px | bg: #FFFFFF | opacity: 1
+───────────────────────────────────────── */
+.section {
+  position: relative;
+  width: 1440px;
+  max-width: 100%;
+  height: 626px;
+  background: #ffffff;
+  opacity: 1;
+
+  /* Figma padding */
+  padding-top: 4px;
+  padding-right: 64px;
+  padding-bottom: 40px;
+  padding-left: 64px;
+  box-sizing: border-box;
+
+  /* Flexbox column — hero row + stats card */
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  /* Grid placement metadata (visual reference) */
+  /* row-start: 3 | column-start: 1 | column-span: 1 | row-span: 1 */
+}
+
+/* ─────────────────────────────────────────
+   Two-column hero row
+   gap: 64px (Figma spec)
+───────────────────────────────────────── */
+.hero {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 64px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ─────────────────────────────────────────
+   LEFT column
+───────────────────────────────────────── */
+.left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* Badge pill */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1.5px solid #F5A623;
+  background: #FFF8EE;
+  color: #F5A623;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* H1 heading */
+.heading {
+  margin: 0;
+  font-family: 'Poppins', 'Sora', sans-serif;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.headingBlue {
+  color: #0F2A52;
+}
+
+.headingOrange {
+  color: #F5A623;
+}
+
+/* Body paragraph */
+.body {
+  margin: 0;
+  font-family: 'Inter', 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.75;
+  color: #5A6472;
+  max-width: 500px;
+}
+
+/* ─────────────────────────────────────────
+   RIGHT column
+───────────────────────────────────────── */
+.right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  min-width: 0;
+  padding-top: 4px;
+  /* leave room for stats card overlap */
+  padding-bottom: 56px;
+}
+
+.heroImage {
+  width: 100%;
+  max-width: 600px;
+  height: 490px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 24px 0px 24px 24px;
+  display: block;
+}
+
+/* ─────────────────────────────────────────
+   Stats card
+   Floats at bottom, overlaps image slightly
+───────────────────────────────────────── */
+.statsCard {
+  position: relative;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(15, 42, 82, 0.10);
+  padding: 24px 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  margin-top: -48px;
+  z-index: 10;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  flex: 1;
+  padding: 0 16px;
+}
+
+.statItem + .statItem {
+  border-left: 1px solid #E8EDF3;
+}
+
+.statIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #FFF3DC;
+  color: #F5A623;
+  margin-bottom: 2px;
+}
+
+.statValue {
+  font-family: 'Poppins', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #0F2A52;
+  line-height: 1;
+}
+
+.statLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #5A6472;
+  line-height: 1.4;
+}
+
+/* ─────────────────────────────────────────
+   Responsive — Tablet 1024px
+───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .section {
+    width: 100%;
+    height: auto;
+    padding: 4px 32px 40px 32px;
+  }
+
+  .hero {
+    gap: 40px;
+  }
+
+  .heading {
+    font-size: 40px;
+  }
+
+  .heroImage {
+    height: 380px;
+  }
+
+  .statsCard {
+    margin-top: -24px;
+    padding: 20px 24px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Responsive — Mobile 768px (stack)
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .section {
+    padding: 24px 20px 32px 20px;
+    height: auto;
+  }
+
+  .hero {
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .right {
+    width: 100%;
+    justify-content: center;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+
+  .heroImage {
+    width: 100%;
+    max-width: 100%;
+    height: 240px;
+    border-radius: 16px;
+  }
+
+  .statsCard {
+    flex-wrap: wrap;
+    padding: 20px 16px;
+    margin-top: 24px;
+    gap: 12px;
+  }
+
+  .statItem {
+    flex: 1 1 calc(50% - 12px);
+    min-width: 120px;
+    padding: 8px;
+  }
+
+  .statItem + .statItem {
+    border-left: none;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Responsive — Small mobile 480px
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .heading {
+    font-size: 30px;
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+
+  .statValue {
+    font-size: 20px;
+  }
+
+  .statsCard {
+    padding: 16px 12px;
+  }
+}

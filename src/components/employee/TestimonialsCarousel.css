@@ -1,0 +1,96 @@
+/* ================================================================
+   TestimonialsCarousel.css
+   - Infinite seamless marquee scroll right-to-left
+   - Pause on hover
+   - No scrollbars
+   ================================================================ */
+
+.testimonials-carousel {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.testimonials-track {
+  display: flex;
+  gap: 44px;
+  width: max-content;
+  animation: marquee-scroll var(--scroll-speed, 30s) linear infinite;
+}
+
+/* Pause — controlled via click on container */
+.testimonials-carousel.paused .testimonials-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    /* Move left by exactly half the width (the duplicate half) */
+    transform: translateX(-50%);
+  }
+}
+
+/* ─── Mobile card sizing & tap toggle cue ─── */
+@media (max-width: 768px) {
+  .testimonials-carousel.is-mobile {
+    cursor: pointer;
+  }
+  .testimonials-carousel.is-mobile.paused {
+    cursor: pointer;
+  }
+  .testimonials-card {
+    min-height: 260px !important;
+  }
+  .testimonials-card-inner {
+    padding-top: 24px !important;
+    gap: 14px !important;
+  }
+  .testimonials-card-text {
+    gap: 10px !important;
+  }
+  .testimonials-card-title {
+    font-size: 16px !important;
+    line-height: 22px !important;
+  }
+  .testimonials-card-quote {
+    font-size: 13px !important;
+    line-height: 17px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .testimonials-track {
+    gap: 10px;
+  }
+  .testimonials-card {
+    min-height: 220px !important;
+  }
+  .testimonials-card-inner {
+    padding-top: 18px !important;
+    gap: 12px !important;
+  }
+  .testimonials-card-text {
+    gap: 8px !important;
+  }
+  .testimonials-card-title {
+    font-size: 14px !important;
+    line-height: 20px !important;
+  }
+  .testimonials-card-quote {
+    font-size: 12px !important;
+    line-height: 15px !important;
+  }
+}
+
+/* Spinner animation for loading state */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

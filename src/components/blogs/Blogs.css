@@ -1,0 +1,107 @@
+/* ========================================================
+   Blogs Page - Mobile Responsive Styles
+   Targets: 320px–768px only
+   Desktop (1024px+) untouched
+   ======================================================== */
+
+/* ---- TABLETS / MOBILE LANDSCAPE (max-width: 768px) ---- */
+@media (max-width: 768px) {
+
+  /* BLOG BANNER */
+  .blog-banner-section {
+    height: 160px !important;
+  }
+
+  .blog-banner-section h1 {
+    font-size: 36px !important;
+  }
+
+  /* FEATURED ARTICLE */
+  .featured-card {
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+
+  .featured-card-text {
+    padding: 24px 20px !important;
+  }
+
+  .featured-card-img {
+    width: 100% !important;
+    height: 200px !important;
+    flex-shrink: 1 !important;
+    margin-right: 0 !important;
+  }
+
+  .featured-heading {
+    font-size: 24px !important;
+    line-height: 32px !important;
+    margin-right: 0 !important;
+  }
+
+  .featured-desc {
+    margin-right: 0 !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+  }
+
+  /* BLOG POSTS GRID */
+  .blog-grid-section {
+    padding: 32px 16px !important;
+  }
+
+  .blog-grid-layout {
+    flex-direction: column !important;
+    gap: 32px !important;
+  }
+
+  .blog-aside {
+    width: 100% !important;
+  }
+}
+
+/* ---- SMALL PHONES (max-width: 480px) ---- */
+@media (max-width: 480px) {
+
+  /* BLOG BANNER */
+  .blog-banner-section {
+    height: 120px !important;
+  }
+
+  .blog-banner-section h1 {
+    font-size: 28px !important;
+  }
+
+  /* FEATURED ARTICLE */
+  .featured-card-text {
+    padding: 16px !important;
+  }
+
+  .featured-card-img {
+    height: 160px !important;
+  }
+
+  .featured-heading {
+    font-size: 20px !important;
+    line-height: 28px !important;
+  }
+
+  .featured-desc {
+    font-size: 13px !important;
+    line-height: 18px !important;
+  }
+
+  /* BLOG POSTS GRID */
+  .blog-grid-section {
+    padding: 24px 12px !important;
+  }
+
+  .blog-article-title {
+    font-size: 16px !important;
+    line-height: 22px !important;
+  }
+
+  .blog-article-desc {
+    font-size: 13px !important;
+  }
+}
