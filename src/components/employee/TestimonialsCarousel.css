@@ -15,7 +15,7 @@
   display: flex;
   gap: 44px;
   width: max-content;
-  animation: marquee-scroll var(--scroll-speed, 30s) linear infinite;
+  will-change: transform;
 }
 
 /* Pause — controlled via click on container */

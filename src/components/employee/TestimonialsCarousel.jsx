@@ -10,10 +10,23 @@ import './TestimonialsCarousel.css';
  * - Renders complete section with dynamic header and carousel
  * - Infinite seamless marquee scroll right-to-left
  * - Duplicates items internally for continuous loop
+ * - Prev/Next buttons step one card at a time
  * - Desktop: pauses on hover, resumes on leave
  * - Mobile (<768px): single tap to stop, single tap to play
  * - Speed configurable via `speed` prop (seconds for one full cycle)
  */
+const ChevronLeftIcon = () => (
+  <svg width="9" height="16" viewBox="0 0 9 16" fill="none">
+    <path d="M8 1L1 8L8 15" stroke="#004CA5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const ChevronRightIcon = () => (
+  <svg width="9" height="16" viewBox="0 0 9 16" fill="none">
+    <path d="M1 1L8 8L1 15" stroke="#004CA5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 export default function TestimonialsCarousel({ speed = 30 }) {
   const [testimonials, setTestimonials] = useState([]);
   const [section, setSection] = useState(null);
@@ -22,6 +35,12 @@ export default function TestimonialsCarousel({ speed = 30 }) {
   const [paused, setPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const carRef = useRef(null);
+  const trackRef = useRef(null);
+  const offsetRef = useRef(0);
+  const pausedRef = useRef(false);
+  const animRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const [trackCycle, setTrackCycle] = useState(0);
 
   // Fetch testimonials on component mount
   useEffect(() => {
@@ -84,9 +103,85 @@ export default function TestimonialsCarousel({ speed = 30 }) {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  const pause = useCallback(() => setPaused(true), []);
-  const resume = useCallback(() => setPaused(false), []);
-  const toggle = useCallback(() => setPaused((p) => !p), []);
+  const pause = useCallback(() => {
+    pausedRef.current = true;
+    setPaused(true);
+  }, []);
+  const resume = useCallback(() => {
+    pausedRef.current = false;
+    setPaused(false);
+  }, []);
+  const toggle = useCallback(() => {
+    pausedRef.current = !pausedRef.current;
+    setPaused(pausedRef.current);
+  }, []);
+
+  // Measure the seamless loop cycle (half of the doubled track width)
+  useEffect(() => {
+    const update = () => {
+      if (trackRef.current) {
+        setTrackCycle(trackRef.current.scrollWidth / 2);
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [testimonials.length]);
+
+  // Drive the marquee with rAF so the buttons can offset it manually
+  useEffect(() => {
+    if (testimonials.length === 0 || loading || trackCycle <= 0) return;
+
+    const pxPerMs = trackCycle / (speed * 1000);
+    let lastTime = performance.now();
+
+    const animate = (time) => {
+      if (trackRef.current && !pausedRef.current) {
+        const delta = time - lastTime;
+        offsetRef.current -= delta * pxPerMs;
+        if (Math.abs(offsetRef.current) >= trackCycle) {
+          offsetRef.current += trackCycle;
+        }
+        trackRef.current.style.transform = `translateX(${offsetRef.current}px)`;
+      }
+      lastTime = time;
+      animRef.current = requestAnimationFrame(animate);
+    };
+    animRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      clearTimeout(timeoutRef.current);
+    };
+  }, [testimonials.length, loading, speed, trackCycle]);
+
+  const scrollCarousel = (dir) => {
+    if (!trackRef.current || testimonials.length === 0) return;
+
+    pausedRef.current = true;
+    setPaused(true);
+    clearTimeout(timeoutRef.current);
+
+    const track = trackRef.current;
+    const cycle = track.scrollWidth / 2;
+    const firstCard = track.children[0];
+    const cardWidth = firstCard ? firstCard.offsetWidth : 540;
+    const gap = parseFloat(window.getComputedStyle(track).columnGap) || 44;
+    const unit = cardWidth + gap;
+    const minOffset = -Math.max(cycle - unit, 0);
+
+    if (dir === 'left') {
+      offsetRef.current = Math.min(offsetRef.current + unit, 0);
+    } else {
+      offsetRef.current = Math.max(offsetRef.current - unit, minOffset);
+    }
+    track.style.transform = `translateX(${offsetRef.current}px)`;
+
+    timeoutRef.current = setTimeout(() => {
+      pausedRef.current = false;
+      setPaused(false);
+    }, 2000);
+  };
 
   // If section is explicitly inactive, don't render
   if (!loading && section?.isActive === false) {
@@ -107,12 +202,15 @@ export default function TestimonialsCarousel({ speed = 30 }) {
     <section
       className="emp-testimonials relative overflow-hidden"
       style={{
+        width: "100vw",
+        marginLeft: "calc(-50vw + 50%)",
         backgroundImage: `url(${testimonialsbg})`,
         backgroundPosition: "center",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        padding: "43px 100px 59px 100px",
+        padding: "43px 80px 59px 80px",
         minHeight: "500px",
+        boxSizing: "border-box",
       }}
     >
       <div
@@ -164,7 +262,7 @@ export default function TestimonialsCarousel({ speed = 30 }) {
             </h2>
           </div>
 
-          {/* Description */}
+          {/* Description + nav buttons */}
           <div className="emp-testimonials-controls flex items-start" style={{ width: '100%', gap: '568px' }}>
             <p
               className="emp-testimonials-desc font-[Inter] text-white m-0"
@@ -181,6 +279,44 @@ export default function TestimonialsCarousel({ speed = 30 }) {
               {section?.sectionDescription ||
                 'Discover the stories and experiences of individuals and companies who have found success and excellence through Applyfier'}
             </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10, flex: 1 }}>
+              <button
+                onClick={(e) => { e.stopPropagation(); scrollCarousel('left'); }}
+                style={{
+                  width: '40.97px',
+                  height: '40.97px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  background: '#EBEEF8',
+                  border: '1px solid #004CA5',
+                  borderRadius: '58.52px',
+                  cursor: 'pointer',
+                  boxSizing: 'border-box',
+                  flexShrink: 0,
+                }}
+                aria-label="Previous"
+              >
+                <ChevronLeftIcon />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); scrollCarousel('right'); }}
+                style={{
+                  width: '40.97px',
+                  height: '40.97px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  background: '#FFFFFF',
+                  borderRadius: '58.52px',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+                aria-label="Next"
+              >
+                <ChevronRightIcon />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -231,7 +367,7 @@ export default function TestimonialsCarousel({ speed = 30 }) {
             style={{ '--scroll-speed': `${speed}s` }}
             {...handlers}
           >
-            <div className="testimonials-track">
+            <div className="testimonials-track" ref={trackRef}>
               {loopItems.map((item, i) => {
                 // Safe field mapping with fallbacks
                 const title = item?.title || '';

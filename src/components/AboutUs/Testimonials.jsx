@@ -226,13 +226,14 @@ const Testimonials = () => {
   }, [displayItems.length]);
 
   const scroll = (dir) => {
-    if (!trackRef.current) return;
+    if (!trackRef.current || displayItems.length === 0) return;
     const cardWidth = 574;
+    const totalWidth = displayItems.length * cardWidth;
     pausedRef.current = true;
     if (dir === "left") {
-      scrollOffset.current += cardWidth;
+      scrollOffset.current = Math.min(scrollOffset.current + cardWidth, 0);
     } else {
-      scrollOffset.current -= cardWidth;
+      scrollOffset.current = Math.max(scrollOffset.current - cardWidth, -totalWidth);
     }
     trackRef.current.style.transform = `translateX(${scrollOffset.current}px)`;
     setTimeout(() => { pausedRef.current = false; }, 2000);

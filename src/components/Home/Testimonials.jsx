@@ -24,8 +24,23 @@ function Testimonials() {
 
   const scroll = (dir) => {
     if (!scrollRef.current) return;
+    const el = scrollRef.current;
     const amount = 574;
-    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+    const atStart = el.scrollLeft <= 0;
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 5;
+    if (dir === "left") {
+      if (atStart) {
+        el.scrollTo({ left: el.scrollWidth, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: -amount, behavior: "smooth" });
+      }
+    } else {
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: amount, behavior: "smooth" });
+      }
+    }
   };
 
   if (!loading && (!data || data.isActive === false)) {

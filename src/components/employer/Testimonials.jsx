@@ -43,16 +43,16 @@ function TestimonialCard({ t }) {
             width: 402,
             display: "flex",
             flexDirection: "column",
-            gap: 30,
+            gap: 24,
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 30, height: 170 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <h3
               style={{
                 fontFamily: "Poppins, sans-serif",
                 fontWeight: 500,
-                fontSize: 20,
-                lineHeight: "30px",
+                fontSize: 18,
+                lineHeight: "26px",
                 color: "#000000",
                 margin: 0,
               }}
@@ -63,8 +63,8 @@ function TestimonialCard({ t }) {
               style={{
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 400,
-                fontSize: 16,
-                lineHeight: "19px",
+                fontSize: 14,
+                lineHeight: "18px",
                 color: "#000000",
                 margin: 0,
               }}
@@ -77,7 +77,7 @@ function TestimonialCard({ t }) {
           style={{
             position: "absolute",
             left: "calc(50% - 200px)",
-            bottom: 40,
+            bottom: 30,
             width: 402,
             display: "flex",
             flexDirection: "column",
@@ -177,13 +177,14 @@ export default function Testimonials() {
   }, [testimonials, loading]);
 
   const scroll = (dir) => {
-    if (!trackRef.current) return;
+    if (!trackRef.current || testimonials.length === 0) return;
     const cardWidth = 574;
+    const totalWidth = testimonials.length * cardWidth;
     pausedRef.current = true;
     if (dir === "left") {
-      scrollOffset.current += cardWidth;
+      scrollOffset.current = Math.min(scrollOffset.current + cardWidth, 0);
     } else {
-      scrollOffset.current -= cardWidth;
+      scrollOffset.current = Math.max(scrollOffset.current - cardWidth, -totalWidth);
     }
     trackRef.current.style.transform = `translateX(${scrollOffset.current}px)`;
     setTimeout(() => { pausedRef.current = false; }, 2000);
