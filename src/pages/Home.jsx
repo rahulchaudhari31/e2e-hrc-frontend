@@ -13,7 +13,7 @@ const Process = lazy(() => import("../components/Home/Process"));
 const WhyChooseUs = lazy(() => import("../components/Home/WhyChooseUs"));
 const TrustedClients = lazy(() => import("../components/Home/TrustedClients"));
 const Locations = lazy(() => import("../components/Home/Locations"));
-const BlogSection = lazy(() => import("../components/Home/BlogSection"));
+const BlogSection = lazy(() => import("../components/Home/Blogsection"));
 const ContactSection = lazy(() => import("../components/Home/ContactSection"));
 
 

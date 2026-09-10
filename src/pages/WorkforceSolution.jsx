@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Hero from '../components/WorkforceSolution/Hero'
 import WorkforceSolutions from '../components/WorkforceSolution/WorkforceSolutions'
-import HowweWork from '../components/WorkforceSolution/HowWeWork'
+import HowWeWork from '../components/WorkforceSolution/HowWeWork'
 import FAQAndCTA from '../components/WorkforceSolution/FAQAndCTA'
 import Testimonials from '../components/WorkforceSolution/Testimonials'
 
@@ -14,7 +14,7 @@ const WorkforceSolution = () => {
       <Navbar />
       <Hero />
       <WorkforceSolutions />
-      <HowweWork />
+      <HowWeWork />
       <FAQAndCTA />
       <Testimonials />
       <Footer />
