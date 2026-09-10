@@ -1,17 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Check, Phone, Mail, User, Paperclip, ChevronDown, ArrowRight, Search } from "lucide-react";
 import { getContactCta } from "../../services/contactCtaService";
+import { toast } from "react-toastify";
+import axios from "axios";
 import groupIcon from "../../assets/images/Career Growth imgs/Group.png";
-
-/**
- * ContactSection.jsx
- *
- * NOTE: Only the UI/markup/styling has been updated to match the provided
- * screenshot. The submit handler below (`handleSubmit`) is a placeholder —
- * wire it back up to your existing API call / form logic exactly as it was
- * before. Do not change the API integration itself, only drop your existing
- * fetch/axios/mutate call into `handleSubmit`.
- */
 
 // Full country list with ISO flag emoji + dial code
 const COUNTRIES = [
@@ -190,6 +182,7 @@ const ContactSection = () => {
   );
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [ctaData, setCtaData] = useState(null);
   const [ctaLoading, setCtaLoading] = useState(true);
   const [ctaError, setCtaError] = useState(false);
@@ -267,16 +260,82 @@ const ContactSection = () => {
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, attachment: e.target.files?.[0] || null }));
+    const selected = e.target.files?.[0] || null;
+    if (!selected) return;
+    const isImage = selected.type.startsWith("image/");
+    if (
+      !isImage &&
+      ![
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ].includes(selected.type)
+    ) {
+      toast.error("Only images and documents (PDF, DOC, DOCX) are allowed.");
+      e.target.value = "";
+      return;
+    }
+    if (selected.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB.");
+      e.target.value = "";
+      return;
+    }
+    setFormData((prev) => ({ ...prev, attachment: selected }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: keep your existing API integration / submit logic here.
-    console.log("Form submitted:", {
-      ...formData,
-      countryCode: selectedCountry.dial,
-    });
+    if (submitting) return;
+
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!formData.name.trim()) {
+      toast.error("Please enter your name.");
+      return;
+    }
+    if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
+      toast.error("Please provide a valid email address.");
+      return;
+    }
+    if (!formData.contactNumber.trim()) {
+      toast.error("Please enter your contact number.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const parts = formData.name.trim().split(/\s+/);
+      const firstName = parts[0] || "";
+      const lastName = parts.slice(1).join(" ") || firstName;
+
+      const payload = new FormData();
+      payload.append("firstName", firstName);
+      payload.append("lastName", lastName);
+      payload.append("company", "Not specified");
+      payload.append("email", formData.email.trim());
+      payload.append("iam", "job_seeker");
+      payload.append("subject", "CV Submission");
+      payload.append(
+        "message",
+        `Contact Number: ${selectedCountry.dial} ${formData.contactNumber.trim()}`
+      );
+      if (formData.attachment) {
+        payload.append("attachment", formData.attachment);
+      }
+
+      await axios.post("/api/contact/enquiries", payload);
+
+      toast.success(
+        "Your enquiry has been submitted. Our team will get back to you shortly."
+      );
+      setFormData({ name: "", email: "", contactNumber: "", attachment: null });
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+          "Something went wrong. Please try again later."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -333,7 +392,7 @@ const ContactSection = () => {
         </div>
 
         {/* RIGHT SIDE - FORM CARD (scrollable) */}
-        <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto h-[560px] flex flex-col">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md mx-auto lg:mx-0 lg:ml-auto h-auto lg:h-[560px] flex flex-col">
           {/* Header (fixed, not part of scroll area) */}
           <div className="flex items-start justify-between mb-3 shrink-0">
             <div className="flex-1 pr-3">
@@ -506,9 +565,10 @@ const ContactSection = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full mt-2 bg-gradient-to-r from-[#0b3a91] to-[#1d56c9] hover:from-[#0a3380] hover:to-[#1a4cb3] transition-colors text-white font-semibold py-3.5 rounded-full shadow-md"
+              disabled={submitting}
+              className="w-full mt-2 bg-gradient-to-r from-[#0b3a91] to-[#1d56c9] hover:from-[#0a3380] hover:to-[#1a4cb3] transition-colors text-white font-semibold py-3.5 rounded-full shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Submit
+              {submitting ? "Submitting..." : "Submit"}
             </button>
           </form>
         </div>

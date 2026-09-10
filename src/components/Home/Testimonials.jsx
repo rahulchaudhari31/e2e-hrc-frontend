@@ -41,11 +41,13 @@ function Testimonials() {
     <section
       className="relative overflow-hidden"
       style={{
+        width: "100vw",
+        marginLeft: "calc(-50vw + 50%)",
         background: "linear-gradient(49.52deg, #1295D4 -4.12%, #7EC443 85.04%)",
         padding: "43px 0 63px",
       }}
     >
-      <div className="mx-auto" style={{ maxWidth: "1240px", padding: "0 20px" }}>
+      <div className="mx-auto" style={{ maxWidth: "1240px", padding: "0 40px" }}>
         {/* Header */}
         <div className="flex flex-col" style={{ gap: "40px" }}>
           <div className="flex flex-col" style={{ gap: "30px" }}>
