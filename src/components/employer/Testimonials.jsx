@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState } from "react";
 import backgroundImg from "../../assets/images/Career Growth imgs/background employerr.png";
-import fordLogo from "../../assets/images/Career Growth imgs/ford 1.png";
 import { getEmployerTestimonials } from "../../services/employer/employerTestimonialsService";
 
 // Default fallback section for when API is not available
@@ -24,8 +23,6 @@ const ChevronRightIcon = () => (
 );
 
 function TestimonialCard({ t }) {
-  const logoSrc = t.companyLogo || fordLogo;
-  
   return (
     <div
       className="testimonial-card"
@@ -74,24 +71,6 @@ function TestimonialCard({ t }) {
           >
             {t.reviewText}
           </p>
-        </div>
-        <div
-          style={{
-            width: 400,
-            height: 0,
-            border: "1px solid rgba(0,0,0,0.25)",
-            transform: "rotate(0.27deg)",
-          }}
-        />
-        <div style={{ display: "flex", alignItems: "center", justifyContent: t.companyName === "Ford" ? "center" : "flex-start" }}>
-          <img 
-            src={logoSrc} 
-            alt={t.companyName || "Company"} 
-            style={{ height: 40, objectFit: "contain" }}
-            onError={(e) => {
-              e.target.src = fordLogo;
-            }}
-          />
         </div>
       </div>
     </div>
