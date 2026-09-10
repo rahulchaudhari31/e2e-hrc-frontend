@@ -1,8 +1,16 @@
 ﻿import { useState } from 'react';
 import { FiMapPin, FiClock, FiGlobe } from 'react-icons/fi';
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 import dropIcon from '../../assets/images/about us images/drop icon.png';
+
+const ALLOWED_DOC_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
 
 export default function ContactFormSection() {
   const [formData, setFormData] = useState({
@@ -13,16 +21,103 @@ export default function ContactFormSection() {
     role: '',
     subject: '',
     message: '',
+    attachment: null,
   });
+  const [submitting, setSubmitting] = useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(e) {
+  function handleFileChange(e) {
+    const selected = e.target.files?.[0] || null;
+    if (!selected) return;
+    const isImage = selected.type.startsWith('image/');
+    if (!isImage && !ALLOWED_DOC_TYPES.includes(selected.type)) {
+      toast.error('Only images and documents (PDF, DOC, DOCX) are allowed.');
+      e.target.value = '';
+      return;
+    }
+    if (selected.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB.');
+      e.target.value = '';
+      return;
+    }
+    setFormData((prev) => ({ ...prev, attachment: selected }));
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    if (submitting) return;
+
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      toast.error('First name and last name are required.');
+      return;
+    }
+    if (!formData.company.trim()) {
+      toast.error('Company is required.');
+      return;
+    }
+    if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
+      toast.error('Please provide a valid email address.');
+      return;
+    }
+    if (!formData.subject.trim()) {
+      toast.error('Subject is required.');
+      return;
+    }
+    if (!formData.message.trim()) {
+      toast.error('Message is required.');
+      return;
+    }
+
+    const iamMap = {
+      '': 'employer',
+      employer: 'employer',
+      employee: 'job_seeker',
+      partner: 'recruitment_partner',
+      other: 'other',
+    };
+
+    setSubmitting(true);
+    try {
+      const payload = new FormData();
+      payload.append('firstName', formData.firstName.trim());
+      payload.append('lastName', formData.lastName.trim());
+      payload.append('company', formData.company.trim());
+      payload.append('email', formData.email.trim());
+      payload.append('iam', iamMap[formData.role] || 'other');
+      payload.append('subject', formData.subject.trim());
+      payload.append('message', formData.message.trim());
+      if (formData.attachment) {
+        payload.append('attachment', formData.attachment);
+      }
+
+      await axios.post('/api/contact/enquiries', payload);
+
+      toast.success(
+        'Your enquiry has been submitted. Our team will get back to you shortly.'
+      );
+      setFormData({
+        firstName: '',
+        lastName: '',
+        company: '',
+        email: '',
+        role: '',
+        subject: '',
+        message: '',
+        attachment: null,
+      });
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+          'Something went wrong. Please try again later.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -263,7 +358,6 @@ export default function ContactFormSection() {
                     boxSizing: 'border-box',
                   }}
                 >
-                  <option value="">Employer Looking for Talent</option>
                   <option value="employer">Employer Looking for Talent</option>
                   <option value="employee">Job Seeker / Candidate</option>
                   <option value="partner">Recruitment Partner</option>
@@ -357,6 +451,7 @@ export default function ContactFormSection() {
             {/* Row 5: Attach Resume / Brief */}
             <div style={{ marginTop: '36px' }}>
               <label
+                htmlFor="attachment"
                 style={{
                   display: 'block',
                   fontFamily: "'Inter', sans-serif",
@@ -371,8 +466,9 @@ export default function ContactFormSection() {
               >
                 ATTACH RESUME / BRIEF (OPTIONAL)
               </label>
-              <div
-                className="flex flex-col items-center justify-center w-full cursor-pointer"
+              <label
+                htmlFor="attachment"
+                className="flex flex-col items-center justify-center w-full cursor-pointer attach-dropzone"
                 style={{
                   border: '2px dashed #F1F2F9',
                   borderRadius: '16px',
@@ -394,15 +490,25 @@ export default function ContactFormSection() {
                     textAlign: 'center',
                   }}
                 >
-                  Click to upload or drag and drop
+                  {formData.attachment
+                    ? formData.attachment.name
+                    : 'Click to upload or drag and drop'}
                 </p>
-              </div>
+                <input
+                  id="attachment"
+                  name="attachment"
+                  type="file"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
             </div>
 
             {/* Row 6: Submit Button */}
             <div style={{ marginTop: '32px' }}>
               <button
                 type="submit"
+                disabled={submitting}
                 className="w-full text-white border-none cursor-pointer"
                 style={{
                   background: '#004CA5',
@@ -417,11 +523,13 @@ export default function ContactFormSection() {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
+                  opacity: submitting ? 0.7 : 1,
+                  cursor: submitting ? 'not-allowed' : 'pointer',
                 }}
-                onMouseEnter={(e) => e.target.style.background = '#003b82'}
-                onMouseLeave={(e) => e.target.style.background = '#004CA5'}
+                onMouseEnter={(e) => { if (!submitting) e.target.style.background = '#003b82'; }}
+                onMouseLeave={(e) => { e.target.style.background = '#004CA5'; }}
               >
-                Submit Inquiry
+                {submitting ? 'Submitting...' : 'Submit Inquiry'}
               </button>
             </div>
           </form>
@@ -565,7 +673,7 @@ export default function ContactFormSection() {
 
             <div className="flex flex-col" style={{ gap: '16px', marginTop: '32px' }}>
               <div
-                className="bg-white"
+                className="bg-white connect-row"
                 style={{
                   border: '1px solid rgba(228,226,225,0.5)',
                   borderRadius: '24px',
@@ -616,7 +724,7 @@ export default function ContactFormSection() {
               </div>
 
               <div
-                className="bg-white"
+                className="bg-white connect-row"
                 style={{
                   border: '1px solid rgba(228,226,225,0.5)',
                   borderRadius: '24px',
@@ -667,7 +775,7 @@ export default function ContactFormSection() {
               </div>
 
               <div
-                className="bg-white"
+                className="bg-white connect-row"
                 style={{
                   border: '1px solid rgba(228,226,225,0.5)',
                   borderRadius: '24px',

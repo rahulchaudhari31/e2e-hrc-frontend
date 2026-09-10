@@ -242,10 +242,9 @@ const Testimonials = () => {
     <section
       style={{
         position: "relative",
-        width: "1440px",
-        maxWidth: "100%",
-        margin: "0 auto",
-        padding: "43px 100px 63px",
+        width: "100vw",
+        marginLeft: "calc(-50vw + 50%)",
+        padding: "43px 80px 63px",
         gap: 50,
         display: "flex",
         flexDirection: "column",

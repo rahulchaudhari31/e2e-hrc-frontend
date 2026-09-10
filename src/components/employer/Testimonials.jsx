@@ -35,46 +35,84 @@ function TestimonialCard({ t }) {
         flexShrink: 0,
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          left: "calc(50% - 200px)",
-          top: 53,
-          width: 402,
-          display: "flex",
-          flexDirection: "column",
-          gap: 30,
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 30, height: 170 }}>
-          <h3
+<div
+          style={{
+            position: "absolute",
+            left: "calc(50% - 200px)",
+            top: 53,
+            width: 402,
+            display: "flex",
+            flexDirection: "column",
+            gap: 30,
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 30, height: 170 }}>
+            <h3
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: 500,
+                fontSize: 20,
+                lineHeight: "30px",
+                color: "#000000",
+                margin: 0,
+              }}
+            >
+              {t.title}
+            </h3>
+            <p
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 400,
+                fontSize: 16,
+                lineHeight: "19px",
+                color: "#000000",
+                margin: 0,
+              }}
+            >
+              {t.reviewText}
+            </p>
+          </div>
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            left: "calc(50% - 200px)",
+            bottom: 40,
+            width: 402,
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          <span
             style={{
               fontFamily: "Poppins, sans-serif",
-              fontWeight: 500,
-              fontSize: 20,
-              lineHeight: "30px",
-              color: "#000000",
-              margin: 0,
-            }}
-          >
-            {t.title}
-          </h3>
-          <p
-            style={{
-              fontFamily: "Inter, sans-serif",
-              fontWeight: 400,
+              fontWeight: 600,
               fontSize: 16,
-              lineHeight: "19px",
+              lineHeight: "24px",
               color: "#000000",
               margin: 0,
             }}
           >
-            {t.reviewText}
-          </p>
+            {t.reviewerName}
+          </span>
+          {t.reviewerDesignation && (
+            <span
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 400,
+                fontSize: 14,
+                lineHeight: "20px",
+                color: "#F39308",
+                margin: 0,
+              }}
+            >
+              {t.reviewerDesignation}
+            </span>
+          )}
         </div>
       </div>
-    </div>
-  );
+    );
 }
 
 export default function Testimonials() {
