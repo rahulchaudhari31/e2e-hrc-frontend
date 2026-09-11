@@ -1,6 +1,24 @@
-﻿import heroBg from '../../assets/images/about us images/about us background.jpg';
+﻿import { useEffect, useState } from 'react';
+import heroBg from '../../assets/images/about us images/about us background.jpg';
+import { getConnectSection } from '../../services/contactUsService';
 
 export default function HeroSection() {
+  const [hero, setHero] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    getConnectSection().then((data) => {
+      if (mounted && data) setHero(data);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const title = hero?.title || 'Connect With';
+  const highlight = hero?.highlightedText || 'E2E HRC';
+  const bg = hero?.backgroundImage || heroBg;
+
   return (
     <section
       style={{
@@ -8,7 +26,7 @@ export default function HeroSection() {
         maxWidth: '100%',
         height: '515px',
         padding: '55px 0px 55px 64px',
-        background: `linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${heroBg}) center / cover no-repeat`,
+        background: `linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${bg}) center / cover no-repeat`,
         borderTop: '1px solid #EAE8E7',
         display: 'flex',
         flexDirection: 'column',
@@ -31,7 +49,7 @@ export default function HeroSection() {
           marginBottom: '60px',
         }}
       >
-        Connect With <span style={{ color: '#F39308' }}>E2E HRC</span>
+        {title} <span style={{ color: '#F39308' }}>{highlight}</span>
       </h1>
     </section>
   );

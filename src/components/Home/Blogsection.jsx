@@ -1,4 +1,12 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { User, Clock, Calendar, ArrowRight } from "lucide-react";
+import {
+  getFeaturedBlog,
+  getBlogs,
+  formatBlogDate,
+  estimateReadTime,
+} from "../../services/blog/blogService";
 
 const defaultPosts = {
   featured: {
@@ -263,7 +271,59 @@ function SmallCard({ card }) {
   );
 }
 
-function BlogSection({ posts = defaultPosts }) {
+function BlogSection() {
+  const [posts, setPosts] = useState(defaultPosts);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        const [featured, blogs] = await Promise.all([
+          getFeaturedBlog(),
+          getBlogs(),
+        ]);
+        if (!mounted) return;
+
+        const nextFeatured = { ...defaultPosts.featured };
+        if (featured && featured.title) {
+          nextFeatured.image = featured.image || nextFeatured.image;
+          nextFeatured.badge = "Featured";
+          nextFeatured.title = featured.title;
+          nextFeatured.description = featured.shortDescription || nextFeatured.description;
+          nextFeatured.author = "E2E HRC Team";
+          nextFeatured.readTime = featured.readTime || nextFeatured.readTime;
+          nextFeatured.date = formatBlogDate(featured.publishedAt) || nextFeatured.date;
+          nextFeatured.link = "/blogs";
+        }
+
+        let nextCards = defaultPosts.cards;
+        if (Array.isArray(blogs) && blogs.length > 0) {
+          nextCards = blogs.slice(0, 3).map((blog) => ({
+            image: blog.image,
+            badge: (blog.tags && blog.tags[0]) || "Expert Insights",
+            badgeBg: "#FFF4E0",
+            badgeColor: "#C17800",
+            title: blog.blogHeading,
+            readTime: estimateReadTime(blog),
+            date: formatBlogDate(blog.publishDate),
+            link: "/blogs",
+          }));
+        }
+
+        setPosts({ featured: nextFeatured, cards: nextCards });
+      } catch (error) {
+        console.error("Failed to load blog section:", error);
+      }
+    };
+
+    load();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const { featured, cards } = posts;
 
   return (
@@ -335,7 +395,8 @@ function BlogSection({ posts = defaultPosts }) {
           </div>
 
           {/* Right - View All Button */}
-          <button
+          <Link
+            to="/blogs"
             style={{
               display: "flex",
               flexDirection: "row",
@@ -348,6 +409,7 @@ function BlogSection({ posts = defaultPosts }) {
               cursor: "pointer",
               boxSizing: "border-box",
               flexShrink: 0,
+              textDecoration: "none",
             }}
           >
             <span
@@ -362,7 +424,7 @@ function BlogSection({ posts = defaultPosts }) {
               View All Articles
             </span>
             <ArrowRight size={15} color="#004CA5" />
-          </button>
+          </Link>
         </div>
 
         {/* Content Container */}

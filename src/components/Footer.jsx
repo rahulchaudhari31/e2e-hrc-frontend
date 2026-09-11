@@ -1,10 +1,81 @@
+import { useState, useEffect } from 'react';
 import { FiPhone, FiMail, FiMapPin } from 'react-icons/fi';
 import mapImage from '../assets/images/map.png';
 import footerLogo from '../assets/images/e2e-logo.png';
+import { getFooterCompany } from '../services/footer/footerCompanyService';
+import { getFooterContact } from '../services/footer/footerContactService';
+import { getFooterNavigation } from '../services/footer/footerNavigationService';
+import { getFooterOfficeLocation } from '../services/footer/footerOfficeLocationService';
 
-const navLinks = ['Home', 'About Us', 'Our Services', 'Latest Jobs', 'Expert Blogs'];
+const DEFAULT_NAV_LINKS = [
+  { label: 'Home', url: '/' },
+  { label: 'About Us', url: '/about' },
+  { label: 'Our Services', url: '/workforce-solutions' },
+  { label: 'Latest Jobs', url: '/submit-vacancy' },
+  { label: 'Expert Blogs', url: '/blogs' },
+];
+
+const extractData = (result) => (result && result.data ? result.data : null);
 
 export default function Footer() {
+  const [data, setData] = useState({
+    company: null,
+    contact: null,
+    navigation: null,
+    office: null,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      try {
+        const [company, contact, navigation, office] = await Promise.all([
+          getFooterCompany(),
+          getFooterContact(),
+          getFooterNavigation(),
+          getFooterOfficeLocation(),
+        ]);
+        if (!isMounted) return;
+        setData({
+          company: extractData(company) || null,
+          contact: extractData(contact) || null,
+          navigation: extractData(navigation) || null,
+          office: extractData(office) || null,
+        });
+      } catch (error) {
+        console.error('Failed to load footer data:', error);
+      }
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const { company, contact, navigation, office } = data;
+
+  const footerLogoUrl = company?.logo || footerLogo;
+  const companyDescription =
+    company?.description ||
+    'Connecting exceptional talent with exceptional businesses across the UK, Europe, South Asia, and the GCC since 2007.';
+  const contactTitle = contact?.sectionTitle || 'UK HEAD OFFICE';
+  const contactAddress =
+    contact?.address ||
+    'Unit 2, 1204B Stratford Road, Hall Green, Birmingham, B28 8HN, UK';
+  const contactPhone = contact?.phone || '+44 (0) 121 778 2400';
+  const contactEmail = contact?.email || 'info@e2ehrc.co.uk';
+  const navigationTitle = navigation?.title || 'NAVIGATION';
+  const menuItems =
+    navigation?.menuItems && navigation.menuItems.length > 0
+      ? navigation.menuItems
+      : DEFAULT_NAV_LINKS;
+  const officeTitle = office?.title || 'Our Office Locations';
+  const officeImage = office?.image || mapImage;
+  const phoneHref = `tel:${contactPhone.replace(/[^+\d]/g, '')}`;
+
   return (
     <>
       <style>{`
@@ -236,50 +307,47 @@ export default function Footer() {
       <footer className="footer-wrap">
         <div className="footer-inner">
           <div className="footer-col brand">
-            <img src={footerLogo} alt="E2E HRC Logo" className="footer-brand-logo" />
+            <img src={footerLogoUrl} alt="E2E HRC Logo" className="footer-brand-logo" />
             <div className="footer-brand-text-wrap">
-              <p className="footer-brand-text">
-                Connecting exceptional talent with exceptional businesses across the UK, Europe,
-                South Asia, and the GCC since 2007.
-              </p>
+              <p className="footer-brand-text">{companyDescription}</p>
             </div>
           </div>
           <div className="footer-col contact">
-            <h3 className="footer-heading">UK HEAD OFFICE</h3>
+            <h3 className="footer-heading">{contactTitle}</h3>
             <address className="footer-contact">
               <div className="footer-contact-row">
                 <FiMapPin size={16} className="footer-contact-icon" style={{ marginTop: '2px' }} aria-hidden="true" />
-                <span className="footer-contact-text">Unit 2, 1204B Stratford Road, Hall Green, Birmingham, B28 8HN, UK</span>
+                <span className="footer-contact-text">{contactAddress}</span>
               </div>
               <div className="footer-contact-row center">
                 <FiPhone size={18} className="footer-contact-icon" aria-hidden="true" />
-                <a href="tel:+441217782400" className="footer-contact-text" style={{ textDecoration: 'none' }}>
-                  +44 (0) 121 778 2400
+                <a href={phoneHref} className="footer-contact-text" style={{ textDecoration: 'none' }}>
+                  {contactPhone}
                 </a>
               </div>
               <div className="footer-contact-row center">
                 <FiMail size={20} className="footer-contact-icon" aria-hidden="true" />
-                <a href="mailto:info@e2ehrc.co.uk" className="footer-contact-text" style={{ textDecoration: 'none' }}>
-                  info@e2ehrc.co.uk
+                <a href={`mailto:${contactEmail}`} className="footer-contact-text" style={{ textDecoration: 'none' }}>
+                  {contactEmail}
                 </a>
               </div>
             </address>
           </div>
           <div className="footer-col nav">
-            <h3 className="footer-heading">NAVIGATION</h3>
+            <h3 className="footer-heading">{navigationTitle}</h3>
             <nav aria-label="Footer navigation">
               <ul className="footer-nav-list">
-                {navLinks.map((link) => (
-                  <li key={link} className="footer-nav-item">
-                    <a href="#" className="footer-nav-link">{link}</a>
+                {menuItems.map((link) => (
+                  <li key={link.label || link.url} className="footer-nav-item">
+                    <a href={link.url || '#'} className="footer-nav-link">{link.label}</a>
                   </li>
                 ))}
               </ul>
             </nav>
           </div>
           <div className="footer-col locations">
-            <h3 className="footer-heading locations">Our Office Locations</h3>
-            <img src={mapImage} alt="Office locations map" className="footer-map" />
+            <h3 className="footer-heading locations">{officeTitle}</h3>
+            <img src={officeImage} alt="Office locations map" className="footer-map" />
           </div>
         </div>
         <div className="footer-bottom">

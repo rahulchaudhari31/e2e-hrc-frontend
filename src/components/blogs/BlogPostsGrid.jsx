@@ -1,4 +1,5 @@
-﻿import { FiCalendar, FiClock } from 'react-icons/fi';
+﻿import { useEffect, useState } from 'react';
+import { FiCalendar, FiClock } from 'react-icons/fi';
 
 import executiveImg from '../../assets/images/our blog images/executive search.jpg';
 import complianceImg from '../../assets/images/our blog images/compliance.png';
@@ -14,8 +15,9 @@ import complianceCatIcon from '../../assets/images/exepert categories/HR complia
 import talentIcon from '../../assets/images/exepert categories/talent analytics.png';
 import leadershipIcon from '../../assets/images/exepert categories/leadership.png';
 import arrowIcon from '../../assets/images/exepert categories/arrow.png';
+import { getBlogs, formatBlogDate, estimateReadTime } from '../../services/blog/blogService';
 
-const articles = [
+const fallbackArticles = [
   {
     tag: 'Executive Search',
     title: 'Navigating Leadership Transitions in Fast-Growing Tech Firms',
@@ -59,6 +61,30 @@ const categories = [
 ];
 
 export default function BlogPostsGrid() {
+  const [articles, setArticles] = useState(fallbackArticles);
+
+  useEffect(() => {
+    let mounted = true;
+
+    getBlogs().then((blogs) => {
+      if (!mounted || !Array.isArray(blogs) || blogs.length === 0) return;
+      setArticles(
+        blogs.slice(0, 4).map((blog) => ({
+          tag: (blog.tags && blog.tags[0]) || 'Recruitment',
+          title: blog.blogHeading,
+          desc: blog.paragraph1 || '',
+          date: formatBlogDate(blog.publishDate) || '',
+          readTime: estimateReadTime(blog),
+          image: blog.image,
+        }))
+      );
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <section className="blog-grid-section bg-[#F7F9FB] px-16 py-20 max-sm:px-4 max-sm:py-10 max-md:px-6 max-md:py-12">
       <div className="blog-grid-layout flex gap-10 max-lg:flex-col max-w-[1440px] mx-auto">
@@ -118,22 +144,16 @@ export default function BlogPostsGrid() {
               <img src={trendingIcon} alt="Trending Now" style={{ width: 16, height: 19 }} />
               <h3 className="font-heading font-semibold text-xl text-[#1B1C1C]">Trending Now</h3>
             </div>
-            <div className="py-4 border-b border-[#EAE8E7] first:pt-0 last:border-b-0 last:pb-0">
-              <p className="font-['Hanken_Grotesk',sans-serif] font-bold text-[11px] tracking-[0.96px] uppercase text-[#003679] mb-1">
-                Career
-              </p>
-              <p className="font-['Hanken_Grotesk',sans-serif] text-sm leading-5 text-[#1B1C1C]">
-                How to Retain Top Performers in a Competitive Market
-              </p>
-            </div>
-            <div className="py-4 border-b border-[#EAE8E7] first:pt-0 last:border-b-0 last:pb-0">
-              <p className="font-['Hanken_Grotesk',sans-serif] font-bold text-[11px] tracking-[0.96px] uppercase text-[#003679] mb-1">
-                Executive Search
-              </p>
-              <p className="font-['Hanken_Grotesk',sans-serif] text-sm leading-5 text-[#1B1C1C]">
-                The Rise of the Fractional Executive: Is It Right for You?
-              </p>
-            </div>
+            {articles.slice(0, 3).map((item) => (
+              <div key={item.title} className="py-4 border-b border-[#EAE8E7] first:pt-0 last:border-b-0 last:pb-0">
+                <p className="font-['Hanken_Grotesk',sans-serif] font-bold text-[11px] tracking-[0.96px] uppercase text-[#003679] mb-1">
+                  {item.tag}
+                </p>
+                <p className="font-['Hanken_Grotesk',sans-serif] text-sm leading-5 text-[#1B1C1C]">
+                  {item.title}
+                </p>
+              </div>
+            ))}
           </div>
 
           <div className="bg-white border border-[#EAE8E7] rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">

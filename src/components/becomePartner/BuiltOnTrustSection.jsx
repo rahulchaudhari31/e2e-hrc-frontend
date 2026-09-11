@@ -1,26 +1,68 @@
-﻿import { FiGlobe, FiHome, FiLayers } from 'react-icons/fi';
+﻿import { useEffect, useState, useMemo } from 'react';
+import { FiGlobe, FiHome, FiLayers } from 'react-icons/fi';
 
 import trustPhoto from '../../assets/images/background coonecting reqrirment/build on trust.jpg';
+import { getPartnerTrust } from '../../services/becomePartnerService';
 
-const checkItems = [
+const iconMap = {
+  FiGlobe: FiGlobe,
+  FiHome: FiHome,
+  FiLayers: FiLayers,
+  globe: FiGlobe,
+  home: FiHome,
+  layers: FiLayers,
+};
+
+const defaultFeatures = [
   {
-    title: 'Extensive Global Network',
-    desc: 'Access to a vast pool of passive candidates and international clients.',
     icon: FiGlobe,
+    title: 'Extensive Global Network',
+    description: 'Access to a vast pool of passive candidates and international clients.',
   },
   {
-    title: 'UK Headquarters, Global Footprint',
-    desc: 'Benefit from our established presence and compliance expertise across major markets.',
     icon: FiHome,
+    title: 'UK Headquarters, Global Footprint',
+    description: 'Benefit from our established presence and compliance expertise across major markets.',
   },
   {
-    title: 'Deep Sector Expertise',
-    desc: 'Leverage our specialised knowledge across healthcare, IT, finance, engineering, hospitality, and more.',
     icon: FiLayers,
+    title: 'Deep Sector Expertise',
+    description: 'Leverage our specialised knowledge across healthcare, IT, finance, engineering, hospitality, and more.',
   },
 ];
 
 export default function BuiltOnTrustSection() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    getPartnerTrust().then((d) => {
+      if (mounted && d) setData(d);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const title = data?.title || 'Built on Trust and Transparency Since 2007';
+  const description = data?.description || 'At E2E HRC, we believe that true partnership goes beyond transactional referrals. We build strategic alliances grounded in mutual respect, shared ethical standards, and a commitment to delivering exceptional talent solutions worldwide.';
+  const image = data?.image || trustPhoto;
+
+  const defaultIcons = [FiGlobe, FiHome, FiLayers];
+
+  const features = useMemo(() => {
+    if (!Array.isArray(data?.features) || data.features.length === 0) return defaultFeatures;
+    return data.features.map((f, i) => {
+      const defaultIcon = defaultIcons[i % defaultIcons.length];
+      const resolvedIcon = iconMap[f.icon] || iconMap[f.iconName] || defaultIcon;
+      return {
+        icon: resolvedIcon,
+        title: f.title || '',
+        description: f.description || '',
+      };
+    });
+  }, [data]);
+
   return (
     <section className="bg-[#FBF9F8] py-[100px]">
       <div className="max-w-[1440px] mx-auto px-6 xl:px-16">
@@ -30,7 +72,7 @@ export default function BuiltOnTrustSection() {
               <div className="absolute inset-0 border border-[#F39308]" style={{ borderWidth: '1.2px' }} />
               <div className="absolute" style={{ left: '12px', top: '12px', width: '435px', height: '463px' }}>
                 <img
-                  src={trustPhoto}
+                  src={image}
                   alt="Our team collaboration"
                   className="w-full h-full object-cover"
                 />
@@ -38,7 +80,7 @@ export default function BuiltOnTrustSection() {
             </div>
             <div className="relative lg:hidden w-full max-w-[520px] mx-auto">
               <img
-                src={trustPhoto}
+                src={image}
                 alt="Our team collaboration"
                 className="w-full h-[380px] md:h-[440px] object-cover rounded-[8px]"
               />
@@ -55,7 +97,7 @@ export default function BuiltOnTrustSection() {
                 color: '#003679',
               }}
             >
-              Built on Trust and Transparency Since 2007
+              {title}
             </h2>
             <p
               style={{
@@ -66,10 +108,10 @@ export default function BuiltOnTrustSection() {
                 color: '#424752',
               }}
             >
-              At E2E HRC, we believe that true partnership goes beyond transactional referrals. We build strategic alliances grounded in mutual respect, shared ethical standards, and a commitment to delivering exceptional talent solutions worldwide.
+              {description}
             </p>
             <div className="flex flex-col gap-6 pt-4">
-              {checkItems.map((item, i) => {
+              {features.map((item, i) => {
                 const Icon = item.icon;
                 return (
                 <div key={i} className="flex gap-4 items-start">
@@ -98,7 +140,7 @@ export default function BuiltOnTrustSection() {
                         color: '#424752',
                       }}
                     >
-                      {item.desc}
+                      {item.description}
                     </p>
                   </div>
                 </div>

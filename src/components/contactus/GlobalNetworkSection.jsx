@@ -1,27 +1,28 @@
-﻿import { useState, useRef, useEffect, useCallback } from 'react';
+﻿import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { FiMapPin, FiClock, FiX, FiCompass } from 'react-icons/fi';
 import { FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
 
 import OfficeInfoCard from '../OfficeInfoCard';
+import { getLocations } from '../../services/becomePartnerService';
 
 import mapBase from '../../assets/images/about us images/map image.png';
 
-const statsData = [
+const defaultStats = [
   { value: '18+', label: 'YEARS EXP' },
   { value: '450+', label: 'CLIENTS' },
   { value: '12k+', label: 'PLACEMENTS' },
   { value: '4', label: 'REGIONAL HUBS' },
 ];
 
-const locationMarkers = [
+const defaultLocationMarkers = [
   { id: 'uk', label: 'UK Head Office', left: '45.01%', top: '30.06%', size: 'w-4 h-4', color: '#00458D', shadow: 'rgba(0,69,141,0.2)', focus: '#F39308', cardTop: -80 },
   { id: 'europe', label: 'Europe Hub', left: '50%', top: '35.05%', size: 'w-3 h-3', color: '#FFB952', shadow: 'rgba(255,185,82,0.2)', focus: '#004CA5', cardTop: -80 },
   { id: 'gcc', label: 'GCC Hub', left: '57.99%', top: '45.01%', size: 'w-3 h-3', color: '#FFB952', shadow: 'rgba(255,185,82,0.2)', focus: '#004CA5', cardTop: -80 },
   { id: 'southasia', label: 'South Asia Hub', left: '64.97%', top: '50%', size: 'w-3 h-3', color: '#FFB952', shadow: 'rgba(255,185,82,0.2)', focus: '#004CA5', cardTop: -80 },
 ];
 
-const officeData = {
+const defaultOfficeData = {
   uk: {
     officeName: 'UK Head Office',
     address: ['1204B Stratford Road, Hall Green,', 'Birmingham, B28 8AS, UK'],
@@ -60,7 +61,29 @@ const officeData = {
   },
 };
 
+const mapLocationsToOfficeData = (locations) => {
+  if (!Array.isArray(locations) || locations.length === 0) return defaultOfficeData;
+  const merged = { ...defaultOfficeData };
+  const slotIds = ['uk', 'europe', 'gcc', 'southasia'];
+  locations.forEach((loc, i) => {
+    if (i >= slotIds.length) return;
+    const id = slotIds[i];
+    const addr = Array.isArray(loc.address) && loc.address.length > 0 ? loc.address : merged[id].address;
+    merged[id] = {
+      officeName: loc.officeName || loc.title || merged[id].officeName,
+      address: addr,
+      phone: loc.phone || merged[id].phone,
+      email: loc.email || merged[id].email,
+      hours: loc.hours || loc.openingHours || merged[id].hours,
+      aboutText: loc.aboutText || loc.aboutDescription || merged[id].aboutText,
+      directionsQuery: loc.directionsQuery || merged[id].directionsQuery,
+    };
+  });
+  return merged;
+};
+
 export default function GlobalNetworkSection() {
+  const [locations, setLocations] = useState([]);
   const [activeOfficeCard, setActiveOfficeCard] = useState(null);
   const cardTimers = useRef({});
   const [isMobile, setIsMobile] = useState(false);
@@ -72,6 +95,25 @@ export default function GlobalNetworkSection() {
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    getLocations().then((list) => {
+      if (mounted && Array.isArray(list) && list.length > 0) setLocations(list);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const officeData = useMemo(() => mapLocationsToOfficeData(locations), [locations]);
+  const statsData = useMemo(() => {
+    const head = locations.find((l) => l.type === 'headOffice') || locations[0];
+    if (head && Array.isArray(head.stats) && head.stats.length === 4) {
+      return head.stats;
+    }
+    return defaultStats;
+  }, [locations]);
 
   const makeHandleEnter = useCallback((id) => () => {
     if (cardTimers.current[id]) clearTimeout(cardTimers.current[id]);
@@ -108,7 +150,7 @@ export default function GlobalNetworkSection() {
                 />
               </div>
 
-              {locationMarkers.map((m) => (
+              {defaultLocationMarkers.map((m) => (
                 <div key={m.id} className="absolute" style={{ left: m.left, top: m.top }}>
                   <button
                     tabIndex={0}
@@ -152,6 +194,7 @@ export default function GlobalNetworkSection() {
 
       {isMobile && activeOfficeCard && (() => {
         const d = officeData[activeOfficeCard];
+        if (!d) return null;
         return createPortal(
           <div
             style={{
@@ -182,7 +225,7 @@ export default function GlobalNetworkSection() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
-                { icon: FiMapPin, color: '#004CA5', content: d.address.map((line, i) => (<span key={i}>{line}{i < d.address.length - 1 && <br />}</span>)) },
+                { icon: FiMapPin, color: '#004CA5', content: (d.address || []).map((line, i) => (<span key={i}>{line}{i < d.address.length - 1 && <br />}</span>)) },
                 { icon: FaPhoneAlt, color: '#004CA5', content: d.phone },
                 { icon: FaEnvelope, color: '#004CA5', content: d.email },
                 { icon: FiClock, color: '#004CA5', content: d.hours },

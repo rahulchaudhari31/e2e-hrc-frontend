@@ -1,10 +1,11 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { FiMapPin, FiClock, FiGlobe } from 'react-icons/fi';
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
 import dropIcon from '../../assets/images/about us images/drop icon.png';
+import { getHeadOffice, getContactCard } from '../../services/contactUsService';
 
 const ALLOWED_DOC_TYPES = [
   'application/pdf',
@@ -13,6 +14,54 @@ const ALLOWED_DOC_TYPES = [
 ];
 
 export default function ContactFormSection() {
+  const [headOffice, setHeadOffice] = useState(null);
+  const [contactCard, setContactCard] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    Promise.all([getHeadOffice(), getContactCard()]).then(
+      ([ho, cc]) => {
+        if (!mounted) return;
+        if (ho) setHeadOffice(ho);
+        if (cc) setContactCard(cc);
+      }
+    );
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const headOfficeTitle = headOffice?.title || 'Head Office Birmingham';
+  const headOfficeAddress = headOffice
+    ? [headOffice.address_line, headOffice.city, headOffice.state, headOffice.postal_code, headOffice.country]
+        .filter(Boolean)
+        .join(', ')
+    : '1204B Stratford Road, Hall Green, Birmingham, West Midlands, B28 8AS';
+  const openingHoursTitle = headOffice?.opening_hours_title || 'Opening Hours';
+  const openingHoursLines =
+    headOffice?.opening_hours ||
+    'Monday \u2013 Friday: 09:00 \u2013 18:00\nSaturday \u2013 Sunday: Closed';
+  const globalInquiriesTitle = headOffice?.global_inquiries_title || 'Global Inquiries';
+  const globalInquiriesDescription =
+    headOffice?.global_inquiries_description ||
+    'Available via virtual consultation in GMT, GST, and IST time zones.';
+
+  const cardTitle = contactCard?.title || 'Ready to Connect? Contact Us Today.';
+  const phoneRow = {
+    label: contactCard?.phone_title || 'Call Us',
+    value: contactCard?.phone_number || '+44 121 778 2400',
+  };
+  const emailRow = {
+    label: contactCard?.email_title || 'Email Us',
+    value: contactCard?.email_address || 'info@e2ehrc.co.uk',
+  };
+  const officeRow = {
+    label: contactCard?.office_title || 'Visit Office',
+    value: contactCard?.office_address || 'Birmingham, B28 8AS',
+  };
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -558,7 +607,7 @@ export default function ContactFormSection() {
                 margin: 0,
               }}
             >
-              Head Office Birmingham
+              {headOfficeTitle}
             </h3>
 
             <div className="flex flex-col" style={{ gap: '24px', marginTop: '24px' }}>
@@ -573,7 +622,7 @@ export default function ContactFormSection() {
                     color: '#1B1C1C',
                   }}
                 >
-                  1204B Stratford Road, Hall Green, Birmingham, West Midlands, B28 8AS
+                  {headOfficeAddress}
                 </span>
               </div>
 
@@ -589,32 +638,23 @@ export default function ContactFormSection() {
                       color: '#1B1C1C',
                     }}
                   >
-                    Opening Hours
+                    {openingHoursTitle}
                   </span>
                   <br />
-                  <span
-                    style={{
-                      fontFamily: "'Inter', sans-serif",
-                      fontWeight: 400,
-                      fontSize: '16px',
-                      lineHeight: '24px',
-                      color: '#424752',
-                    }}
-                  >
-                    Monday â€“ Friday: 09:00 â€“ 18:00
-                  </span>
-                  <br />
-                  <span
-                    style={{
-                      fontFamily: "'Inter', sans-serif",
-                      fontWeight: 400,
-                      fontSize: '16px',
-                      lineHeight: '24px',
-                      color: '#424752',
-                    }}
-                  >
-                    Saturday â€“ Sunday: Closed
-                  </span>
+                  {openingHoursLines.split('\n').map((line, i) => (
+                    <span
+                      key={i}
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontWeight: 400,
+                        fontSize: '16px',
+                        lineHeight: '24px',
+                        color: '#424752',
+                      }}
+                    >
+                      {line}
+                    </span>
+                  ))}
                 </div>
               </div>
 
@@ -630,7 +670,7 @@ export default function ContactFormSection() {
                       color: '#1B1C1C',
                     }}
                   >
-                    Global Inquiries
+                    {globalInquiriesTitle}
                   </span>
                   <br />
                   <span
@@ -642,7 +682,7 @@ export default function ContactFormSection() {
                       color: '#424752',
                     }}
                   >
-                    Available via virtual consultation in GMT, GST, and IST time zones.
+                    {globalInquiriesDescription}
                   </span>
                 </div>
               </div>
@@ -668,7 +708,7 @@ export default function ContactFormSection() {
                 margin: 0,
               }}
             >
-              Ready to Connect? Contact Us Today.
+              {cardTitle}
             </h3>
 
             <div className="flex flex-col" style={{ gap: '16px', marginTop: '32px' }}>
@@ -706,7 +746,7 @@ export default function ContactFormSection() {
                       margin: 0,
                     }}
                   >
-                    Call Us
+                    {phoneRow.label}
                   </p>
                   <p
                     style={{
@@ -718,7 +758,7 @@ export default function ContactFormSection() {
                       margin: 0,
                     }}
                   >
-                    +44 121 778 2400
+                    {phoneRow.value}
                   </p>
                 </div>
               </div>
@@ -757,7 +797,7 @@ export default function ContactFormSection() {
                       margin: 0,
                     }}
                   >
-                    Email Us
+                    {emailRow.label}
                   </p>
                   <p
                     style={{
@@ -769,7 +809,7 @@ export default function ContactFormSection() {
                       margin: 0,
                     }}
                   >
-                    info@e2ehrc.co.uk
+                    {emailRow.value}
                   </p>
                 </div>
               </div>
@@ -808,7 +848,7 @@ export default function ContactFormSection() {
                       margin: 0,
                     }}
                   >
-                    Visit Office
+                    {officeRow.label}
                   </p>
                   <p
                     style={{
@@ -820,7 +860,7 @@ export default function ContactFormSection() {
                       margin: 0,
                     }}
                   >
-                    Birmingham, B28 8AS
+                    {officeRow.value}
                   </p>
                 </div>
               </div>

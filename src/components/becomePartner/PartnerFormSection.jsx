@@ -1,13 +1,33 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 import teamPhoto from '../../assets/images/background coonecting reqrirment/background connectivity.jpeg';
 import nameIcon from '../../assets/images/background coonecting reqrirment/NAME.png';
 import mailIcon from '../../assets/images/background coonecting reqrirment/MAIL ICON.png';
+import { getRecruitmentPartnersSection } from '../../services/becomePartnerService';
 
 export default function PartnerFormSection() {
-  const [formData, setFormData] = useState({ name: '', email: '', phoneCode: '+971', phone: '', message: '' });
+  const [sectionData, setSectionData] = useState(null);
+  const [formData, setFormData] = useState({ name: '', email: '', countryCode: '+971', contactNumber: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    let mounted = true;
+    getRecruitmentPartnersSection().then((data) => {
+      if (mounted && data) setSectionData(data);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const title1 = sectionData?.title || 'Connecting';
+  const title2 = sectionData?.highlightText || 'Recruitment Partners';
+  const title3 = sectionData?.subtitle || 'Worldwide';
+  const bgImage = sectionData?.backgroundImage || teamPhoto;
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -19,15 +39,28 @@ export default function PartnerFormSection() {
     const err = {};
     if (!formData.name.trim()) err.name = 'Required';
     if (!formData.email.trim()) err.email = 'Required';
-    if (!formData.phone.trim()) err.phone = 'Required';
+    if (!formData.contactNumber.trim()) err.contactNumber = 'Required';
     setErrors(err);
     return Object.keys(err).length === 0;
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (validate()) {
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      await axios.post('/api/partnership-enquiries', {
+        name: formData.name,
+        email: formData.email,
+        countryCode: formData.countryCode,
+        contactNumber: formData.contactNumber,
+        message: formData.message,
+      });
       setSubmitted(true);
+    } catch {
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -38,7 +71,7 @@ export default function PartnerFormSection() {
           <div
             className="relative w-full min-h-[340px] lg:h-[463px]"
             style={{
-              backgroundImage: `url(${teamPhoto})`,
+              backgroundImage: `url(${bgImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
@@ -85,9 +118,9 @@ export default function PartnerFormSection() {
                     margin: 0,
                   }}
                 >
-                  <span style={{ display: 'block' }}>Connecting</span>
-                  <span style={{ display: 'block' }}>Recruitment Partners</span>
-                  <span style={{ display: 'block', color: '#F39308' }}>Worldwide</span>
+                  <span style={{ display: 'block' }}>{title1}</span>
+                  <span style={{ display: 'block' }}>{title2}</span>
+                  <span style={{ display: 'block', color: '#F39308' }}>{title3}</span>
                 </h1>
                 <h1
                   className="lg:hidden text-white"
@@ -101,7 +134,7 @@ export default function PartnerFormSection() {
                     filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
                   }}
                 >
-                  Connecting<br />Recruitment Partners<br /><span style={{ color: '#F39308' }}>Worldwide</span>
+                  {title1}<br />{title2}<br /><span style={{ color: '#F39308' }}>{title3}</span>
                 </h1>
               </div>
             </div>
@@ -220,31 +253,31 @@ export default function PartnerFormSection() {
                     <div className="flex flex-col sm:flex-row" style={{ gap: '7.99px' }}>
                       <div className="relative w-full sm:w-[165px]">
                         <select
-                          name="phoneCode"
-                          value={formData.phoneCode}
+                          name="countryCode"
+                          value={formData.countryCode}
                           onChange={handleChange}
                           className="bg-white"
                           style={{ width: '100%', height: '44px', padding: '12px', border: '1px solid #F1F2F9', borderRadius: '16px', outline: 'none', boxSizing: 'border-box', fontFamily: "'Inter', sans-serif", fontSize: '16px', lineHeight: '24px', color: '#1B1C1C' }}
                         >
-                          <option value="UAE +971">UAE +971</option>
-                          <option value="UK +44">UK +44</option>
-                          <option value="US +1">US +1</option>
-                          <option value="IN +91">IN +91</option>
+                          <option value="+971">UAE +971</option>
+                          <option value="+44">UK +44</option>
+                          <option value="+1">US +1</option>
+                          <option value="+91">IN +91</option>
                         </select>
                       </div>
                       <div className="relative" style={{ flex: 1 }}>
                         <input
                           type="tel"
-                          name="phone"
+                          name="contactNumber"
                           placeholder="(000) 000-0000"
-                          value={formData.phone}
+                          value={formData.contactNumber}
                           onChange={handleChange}
                           className="w-full bg-white"
                           style={{ height: '44px', padding: '13px 16px', border: '1px solid #F1F2F9', borderRadius: '16px', outline: 'none', boxSizing: 'border-box', fontFamily: "'Source Sans 3', sans-serif", fontSize: '16px', lineHeight: '16px' }}
                         />
                       </div>
                     </div>
-                    {errors.phone && <span className="text-red-500 text-xs mt-1 block">{errors.phone}</span>}
+                    {errors.contactNumber && <span className="text-red-500 text-xs mt-1 block">{errors.contactNumber}</span>}
                   </div>
 
                   <div>
@@ -267,6 +300,7 @@ export default function PartnerFormSection() {
 
                   <button
                     type="submit"
+                    disabled={submitting}
                     className="w-full text-white"
                     style={{
                       fontFamily: "'Source Sans 3', sans-serif",
@@ -277,13 +311,14 @@ export default function PartnerFormSection() {
                       height: '44px',
                       border: 'none',
                       borderRadius: '12px',
-                      cursor: 'pointer',
+                      cursor: submitting ? 'not-allowed' : 'pointer',
                       boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                      opacity: submitting ? 0.7 : 1,
                     }}
-                    onMouseEnter={(e) => e.target.style.background = '#003b82'}
-                    onMouseLeave={(e) => e.target.style.background = '#004CA5'}
+                    onMouseEnter={(e) => { if (!submitting) e.target.style.background = '#003b82'; }}
+                    onMouseLeave={(e) => { e.target.style.background = '#004CA5'; }}
                   >
-                    Submit
+                    {submitting ? 'Submitting...' : 'Submit'}
                   </button>
                 </form>
               )}
