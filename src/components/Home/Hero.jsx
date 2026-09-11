@@ -244,21 +244,8 @@ function Hero() {
             <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", padding: "0px", gap: "24px", width: "576.25px", height: "70px" }}>
               <AnimatedStat target={100} suffix="+" label="CLIENTS" containerWidth="96px" duration={800} delay={100} />
               <AnimatedStat target={100} suffix="+" label="CANDIDATES" containerWidth="131px" duration={800} delay={250} />
-              {[
-                { number: "25+", label: "YEARS OF EXPERIENCE", containerWidth: "138.62px" },
-                { number: "4", label: "OFFICES", containerWidth: "138.62px" },
-              ].map((stat) => (
-                <div key={stat.label} style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0px 0px 24px", width: stat.containerWidth, height: "72px" }}>
-                  <span style={{ fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 700, fontSize: "24px", lineHeight: "32px", color: "#004CA5", display: "flex", alignItems: "center", height: "32px", marginLeft: "-64px" }}>
-                    {stat.number}
-                  </span>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "0px", width: stat.containerWidth, height: "16px" }}>
-                    <span style={{ fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 400, fontSize: "12px", lineHeight: "16px", display: "flex", alignItems: "center", letterSpacing: "0.3px", textTransform: "uppercase", color: "#000000" }}>
-                      {stat.label}
-                    </span>
-                  </div>
-                </div>
-              ))}
+              <AnimatedStat target={25} suffix="+" label="YEARS OF EXPERIENCE" containerWidth="138.62px" duration={800} delay={400} />
+              <AnimatedStat target={4} suffix="" label="OFFICES" containerWidth="138.62px" duration={800} delay={550} />
             </div>
           </div>
 
