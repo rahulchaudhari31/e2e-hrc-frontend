@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import manufacturingImg from '../../assets/assets/sectors/manuifacturing.jpg';
 import healthcareImg from '../../assets/assets/sectors/healthcare.jpg';
@@ -6,8 +7,19 @@ import constructionImg from '../../assets/assets/sectors/construction.jpg';
 import logisticsImg from '../../assets/assets/sectors/logistics.jpg';
 import financeImg from '../../assets/assets/sectors/finance.jpg';
 import educationImg from '../../assets/assets/sectors/education.jpg';
+import { getEmployeeCards } from '../../services/employeeCardService';
 
-const industries = [
+const fallbackImages = [
+  manufacturingImg,
+  healthcareImg,
+  engineeringImg,
+  constructionImg,
+  logisticsImg,
+  financeImg,
+  educationImg,
+];
+
+const defaultIndustries = [
   { name: 'Manufacturing', image: manufacturingImg },
   { name: 'Healthcare', image: healthcareImg },
   { name: 'Engineering', image: engineeringImg },
@@ -18,6 +30,25 @@ const industries = [
 ];
 
 export default function IndustriesSection() {
+  const [industries, setIndustries] = useState(defaultIndustries);
+
+  useEffect(() => {
+    let isMounted = true;
+    getEmployeeCards().then((res) => {
+      if (!isMounted) return;
+      const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+      const mapped = list
+        .filter((c) => c.isActive !== false)
+        .sort((a, b) => Number(a.displayOrder ?? 0) - Number(b.displayOrder ?? 0))
+        .map((c, i) => ({
+          name: c.titleLine || c.badgeText || `Sector ${i + 1}`,
+          image: c.image || fallbackImages[i % fallbackImages.length],
+        }));
+      if (mapped.length > 0) setIndustries(mapped);
+    });
+    return () => { isMounted = false; };
+  }, []);
+
   const scroll = (dir) => {
     const el = document.getElementById('emp-industries-scroll');
     if (el) {

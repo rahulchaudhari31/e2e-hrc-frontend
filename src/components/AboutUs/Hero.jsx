@@ -118,9 +118,13 @@ export default function HeroSection() {
                 color: "#ffffff",
               }}
             >
-              <span style={{ color: "#FFFFFF" }}>Connecting Talent.</span>
-              <br />
-              <span style={{ color: "#004CA5" }}>Building Futures.</span>
+              {title ? <span style={{ color: "#FFFFFF" }}>{title}</span> : <span style={{ color: "#FFFFFF" }}>Connecting Talent.</span>}
+              {!title && (
+                <>
+                  <br />
+                  <span style={{ color: "#004CA5" }}>Building Futures.</span>
+                </>
+              )}
             </h1>
 
             <p

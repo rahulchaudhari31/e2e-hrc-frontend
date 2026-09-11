@@ -47,6 +47,8 @@ export default function Hero() {
   if (!heroData) return <HeroFallback />;
 
   const backgroundImage = heroData.image || null;
+  const title = heroData.title || "Employer Recruitment";
+  const subtitle = heroData.subtitle || "Helping businesses hire the right talent.";
 
   return (
     <section
@@ -94,7 +96,7 @@ export default function Hero() {
               color: "#F39308",
             }}
           >
-            Employer Recruitment
+            {title}
           </div>
 
           {/* Orange line - right below Employer Recruitment */}
@@ -126,7 +128,7 @@ export default function Hero() {
               color: "#FFFFFF",
             }}
           >
-            Helping businesses hire the right talent.
+            {subtitle}
           </div>
         </div>
       </div>

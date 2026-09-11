@@ -1,9 +1,19 @@
+import { useEffect, useState } from "react";
 import buildingImage from '../../assets/assets/images/building.jpg';
 import manImage from '../../assets/assets/images/Man.jpg';
 import randomImage from '../../assets/assets/images/random image.jpg';
+import { getEmployeeHRCWhyChoose } from "../../services/employee/employeeHRCWhyChooseService";
 
-const rows = [
+const fallbackImages = [buildingImage, manImage, randomImage];
+
+const defaultSection = {
+  badgeText: "Why Choose E2E HRC",
+  sectionTitle: "What makes us different",
+};
+
+const defaultRows = [
   {
+    _id: "h",
     letter: 'H',
     eyebrow: 'People first, always',
     eyebrowColor: '#004CA5',
@@ -27,6 +37,7 @@ const rows = [
     statsPadTop: '20px',
   },
   {
+    _id: "r",
     letter: 'R',
     eyebrow: 'Measurable outcomes',
     eyebrowColor: '#F39308',
@@ -49,6 +60,7 @@ const rows = [
     statsPadTop: '20px',
   },
   {
+    _id: "c",
     letter: 'C',
     eyebrow: 'Long-term partnership',
     eyebrowColor: '#C9DB82',
@@ -72,21 +84,65 @@ const rows = [
   },
 ];
 
+const toRow = (card, index) => ({
+  _id: card._id || `row-${index}`,
+  letter: card.letter || '',
+  eyebrow: card.eyebrow || '',
+  eyebrowColor: card.eyebrowColor || '#004CA5',
+  title: card.title || '',
+  desc: card.description || '',
+  stats: Array.isArray(card.stats) ? card.stats : [],
+  image: card.image || fallbackImages[index % fallbackImages.length],
+  statColor: card.statColor || '#004CA5',
+  letterColor: card.letterColor || 'rgba(0,76,165,0.1)',
+  gradient: !!card.gradient,
+  imageOnRight: !!card.imageOnRight,
+  letterPos: {
+    left: card.letterPosLeft || '',
+    right: card.letterPosRight || '0',
+    top: card.letterPosTop || '0',
+  },
+});
+
 export default function WhyChooseSection() {
+  const [section, setSection] = useState(defaultSection);
+  const [rows, setRows] = useState(defaultRows);
+
+  useEffect(() => {
+    let isMounted = true;
+    getEmployeeHRCWhyChoose().then((data) => {
+      if (!isMounted || !data) return;
+      if (data.section && data.section.sectionTitle) {
+        setSection({
+          badgeText: data.section.badgeText || 'Why Choose E2E HRC',
+          sectionTitle: data.section.sectionTitle,
+        });
+      }
+      if (Array.isArray(data.cards) && data.cards.length > 0) {
+        const active = data.cards
+          .filter((c) => c.isActive !== false)
+          .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0))
+          .map(toRow);
+        if (active.length > 0) setRows(active);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
+
   return (
     <section className="px-4 bg-white lg:pt-[46px] lg:pb-[6px]">
       <div className="mx-auto flex flex-col lg:gap-[30px]" style={{ maxWidth: '1440px' }}>
         <div className="flex flex-col items-center text-center lg:w-[1325px] lg:h-[83.99px] mx-auto">
           <span className="inline-flex items-center bg-[#E8EDF5] text-[#004CA5] font-body font-semibold text-[12px] leading-[16px] tracking-[0px] px-3 py-[6px] rounded-full">
-            Why Choose E2E HRC
+            {section.badgeText}
           </span>
           <h2 className="font-heading font-[800] text-3xl sm:text-4xl lg:text-[36px] lg:leading-[40px] tracking-[0px] text-[#004CA5] lg:mt-3">
-            What makes us different
+            {section.sectionTitle}
           </h2>
         </div>
 
         <div className="flex flex-col lg:gap-[30px]">
-          {rows.map(({ letter, eyebrow, eyebrowColor, title, desc, stats, image, statColor, letterColor, letterPos, eyebrowBg, gradient, imageOnRight, rowWidth, imageWidth, textWidth, textPadEyebrow, textPad, statsPadTop, titleWidth }) => {
+          {rows.map(({ letter, eyebrow, eyebrowColor, title, desc, stats, image, statColor, letterColor, letterPos, eyebrowBg, gradient, imageOnRight, rowWidth, imageWidth, textWidth, textPadEyebrow, textPad, statsPadTop, titleWidth }, rowIndex) => {
             const ImageBlock = (
               <div
                 className="relative overflow-hidden shrink-0"
@@ -180,7 +236,7 @@ export default function WhyChooseSection() {
 
             return (
               <div
-                key={letter}
+                key={`${letter || rowIndex}-${rowIndex}`}
                 className="relative mx-auto hidden lg:block overflow-hidden bg-[#F8FAFC]"
                 style={{ width: rowWidth, height: '420px', borderRadius: '20px' }}
               >
@@ -201,8 +257,8 @@ export default function WhyChooseSection() {
 
         {/* Mobile layout */}
         <div className="flex flex-col gap-6 lg:hidden mt-8">
-          {rows.map(({ letter, eyebrow, eyebrowColor, title, desc, stats, image, statColor, gradient }) => (
-            <div key={letter} className="bg-[#F8FAFC] rounded-2xl overflow-hidden">
+          {rows.map(({ letter, eyebrow, eyebrowColor, title, desc, stats, image, statColor, gradient }, rowIndex) => (
+            <div key={`${letter || rowIndex}-${rowIndex}`} className="bg-[#F8FAFC] rounded-2xl overflow-hidden">
               <div className="w-full h-[280px] overflow-hidden relative">
                 <img src={image} alt={title} className="w-full h-full object-cover" />
                 {gradient && (

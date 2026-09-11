@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import ukImg from '../../assets/assets/Professionals/UK.jpg';
 import strategyImg from '../../assets/assets/Professionals/strategy.jpg';
 import workforceImg from '../../assets/assets/Professionals/workforceplanning.jpg';
 import leadershipImg from '../../assets/assets/Professionals/leadership.jpg';
+import { getBlogs, formatBlogDate, estimateReadTime } from "../../services/blog/blogService";
 
 const defaultFeatured = {
   image: ukImg,
@@ -43,6 +45,22 @@ const defaultPosts = [
   },
 ];
 
+const postCategoryStyles = [
+  { categoryBg: '#FDECD2', categoryColor: '#C17800' },
+  { categoryBg: '#EFF5D6', categoryColor: '#5A7A00' },
+  { categoryBg: '#EAF1FB', categoryColor: '#004CA5' },
+];
+
+const toPost = (blog, style) => ({
+  image: blog?.image || strategyImg,
+  category: blog?.tags?.[0] || 'Insights',
+  categoryBg: style.categoryBg,
+  categoryColor: style.categoryColor,
+  title: blog?.blogHeading || '',
+  readTime: estimateReadTime(blog),
+  date: formatBlogDate(blog?.publishDate),
+});
+
 function PersonIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -69,14 +87,31 @@ function ArrowIcon() {
   );
 }
 
-export default function LatestInsights({
-  featured = defaultFeatured,
-  posts = defaultPosts,
-  eyebrow = 'Latest Blog',
-  heading = 'Career Growth Strategies for Professionals',
-  ctaLabel = 'View All Blog',
-  ctaHref = '#',
-}) {
+export default function LatestInsights(initial = {}) {
+  const [featured, setFeatured] = useState(initial.featured || defaultFeatured);
+  const [posts, setPosts] = useState(initial.posts || defaultPosts);
+  const eyebrow = initial.eyebrow || 'Latest Blog';
+  const heading = initial.heading || 'Career Growth Strategies for Professionals';
+  const ctaLabel = initial.ctaLabel || 'View All Blog';
+  const ctaHref = initial.ctaHref || '#';
+
+  useEffect(() => {
+    let isMounted = true;
+    getBlogs().then((blogs) => {
+      if (!isMounted) return;
+      const active = (Array.isArray(blogs) ? blogs : [])
+        .filter((b) => b.isActive !== false)
+        .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+      if (active.length > 0) {
+        setFeatured(toPost(active[0], { categoryBg: '#004CA5', categoryColor: '#FFFFFF' }));
+        setPosts(
+          active.slice(1, 4).map((blog, i) => toPost(blog, postCategoryStyles[i % postCategoryStyles.length]))
+        );
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
+
   return (
     <section className="py-16 md:py-20 bg-[#F8FAFC]">
       <div className="mx-auto pl-[24px] pr-[24px] lg:pl-[124px] lg:pr-[32px]" style={{ maxWidth: '1440px' }}>

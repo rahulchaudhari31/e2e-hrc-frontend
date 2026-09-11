@@ -1,8 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import mapImg from "../../assets/images/live map.png";
+import { getActiveGlobalFootprint } from "../../services/aboutus/globalFootprintService";
 
-const officeData = {
-  uk: {
+const defaultOffices = [
+  {
+    key: "uk",
     name: "UK Head Office",
     address: "Unit 2, 1204B Stratford Road, Hall Green, Birmingham, B28 8AS, UK",
     phone: "+44 (0) 121 778 2400",
@@ -10,8 +12,15 @@ const officeData = {
     hours: "Mon to Fri: 9AM to 6PM",
     about: "Our UK head office is located in Birmingham, easily accessible by road and public transport.",
     query: "Unit 2, 1204B Stratford Road, Hall Green, Birmingham, B28 8AS, UK",
+    markerLeft: "45.01%",
+    markerTop: "30.06%",
+    markerColor: "#00458D",
+    markerShadow: "rgba(0,69,141,0.2)",
+    markerFocus: "#F39308",
+    primary: true,
   },
-  gcc: {
+  {
+    key: "gcc",
     name: "GCC Hub",
     address: "Level 14, Al Fattan Currency House, Tower 2, DIFC, Dubai, UAE",
     phone: "+971 4 123 4567",
@@ -19,8 +28,15 @@ const officeData = {
     hours: "Sun to Thu: 9AM to 6PM",
     about: "Our GCC hub in Dubai serves as the central operations base for the Middle East and North Africa region.",
     query: "Level 14, Al Fattan Currency House, Tower 2, DIFC, Dubai, UAE",
+    markerLeft: "57.99%",
+    markerTop: "45.01%",
+    markerColor: "#FFB952",
+    markerShadow: "rgba(255,185,82,0.2)",
+    markerFocus: "#004CA5",
+    primary: false,
   },
-  europe: {
+  {
+    key: "europe",
     name: "Europe Hub",
     address: "Friedrichstrasse 68, 10117 Berlin, Germany",
     phone: "+49 30 1234 5678",
@@ -28,8 +44,15 @@ const officeData = {
     hours: "Mon to Fri: 9AM to 6PM",
     about: "Our Berlin office connects clients and candidates across the European Union.",
     query: "Friedrichstrasse 68, 10117 Berlin, Germany",
+    markerLeft: "50%",
+    markerTop: "35.05%",
+    markerColor: "#FFB952",
+    markerShadow: "rgba(255,185,82,0.2)",
+    markerFocus: "#004CA5",
+    primary: false,
   },
-  india: {
+  {
+    key: "india",
     name: "South Asia Hub",
     address: "91 Springboard, Sector 44, Gurugram, Haryana 122003, India",
     phone: "+91 124 456 7890",
@@ -37,14 +60,13 @@ const officeData = {
     hours: "Mon to Sat: 9AM to 6PM",
     about: "Our Gurugram office drives our South Asia operations, offering end-to-end recruitment services.",
     query: "91 Springboard, Sector 44, Gurugram, Haryana 122003, India",
+    markerLeft: "64.97%",
+    markerTop: "50%",
+    markerColor: "#FFB952",
+    markerShadow: "rgba(255,185,82,0.2)",
+    markerFocus: "#004CA5",
+    primary: false,
   },
-};
-
-const markers = [
-  { id: "uk", label: "UK Head Office", left: "45.01%", top: "30.06%", color: "#00458D", shadow: "rgba(0,69,141,0.2)", focus: "#F39308", primary: true },
-  { id: "gcc", label: "GCC Hub", left: "57.99%", top: "45.01%", color: "#FFB952", shadow: "rgba(255,185,82,0.2)", focus: "#004CA5" },
-  { id: "europe", label: "Europe Hub", left: "50%", top: "35.05%", color: "#FFB952", shadow: "rgba(255,185,82,0.2)", focus: "#004CA5" },
-  { id: "india", label: "South Asia Hub", left: "64.97%", top: "50%", color: "#FFB952", shadow: "rgba(255,185,82,0.2)", focus: "#004CA5" },
 ];
 
 /* ── SVG icons ── */
@@ -171,7 +193,47 @@ function InfoRow({ icon, children }) {
 /* ── main component ── */
 export default function GlobalFootprint() {
   const [active, setActive] = useState(null);
+  const [doc, setDoc] = useState(null);
   const timerRef = useRef({});
+
+  useEffect(() => {
+    let isMounted = true;
+    getActiveGlobalFootprint().then((d) => {
+      if (isMounted && d && Array.isArray(d.offices) && d.offices.length > 0) {
+        setDoc(d);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
+
+  const offices = doc?.offices?.length ? doc.offices : defaultOffices;
+  const officeData = offices.reduce((acc, o, i) => {
+    const key = o.key || `office${i + 1}`;
+    acc[key] = {
+      name: o.name,
+      address: o.address,
+      phone: o.phone,
+      email: o.email,
+      hours: o.hours,
+      about: o.about,
+      query: o.query,
+    };
+    return acc;
+  }, {});
+  const markers = offices.map((o) => ({
+    id: o.key || o.name,
+    label: o.name,
+    left: o.markerLeft || "50%",
+    top: o.markerTop || "50%",
+    color: o.markerColor || "#FFB952",
+    shadow: o.markerShadow || "rgba(255,185,82,0.2)",
+    focus: o.markerFocus || "#004CA5",
+    primary: !!o.primary,
+  }));
+  const sectionTitle = doc?.title || "Our Global Footprint";
+  const sectionDescription =
+    doc?.description ||
+    "Connecting talent across borders with localized expertise and global reach.";
 
   const enter = useCallback((id) => {
     if (timerRef.current[id]) clearTimeout(timerRef.current[id]);
@@ -198,10 +260,10 @@ export default function GlobalFootprint() {
       {/* header */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0 32px", gap: "16px", maxWidth: 768 }}>
         <h2 style={{ margin: 0, fontFamily: "Poppins, sans-serif", fontWeight: 800, fontSize: 36, lineHeight: "56px", letterSpacing: "-0.48px", color: "#191C1E", textAlign: "center" }}>
-          Our Global Footprint
+          {sectionTitle}
         </h2>
         <p style={{ margin: 0, fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 18, lineHeight: "28px", color: "#424752", textAlign: "center", maxWidth: 672 }}>
-          Connecting talent across borders with localized expertise and global reach.
+          {sectionDescription}
         </p>
       </div>
 

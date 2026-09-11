@@ -168,24 +168,30 @@ function TestimonialCard({ t }) {
 
 const Testimonials = () => {
   const [items, setItems] = useState([]);
+  const [section, setSection] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
         const response = await getTestimonials();
-        const activeItems = (response?.data || [])
+        const payload = response?.data || {};
+        if (payload.section) setSection(payload.section);
+
+        const cards = Array.isArray(payload.cards) ? payload.cards : [];
+        const activeItems = cards
           .filter((item) => item.isActive !== false)
           .sort((a, b) => Number(a.displayOrder ?? a.order ?? 0) - Number(b.displayOrder ?? b.order ?? 0));
 
         if (activeItems.length > 0) {
-          const withLogos = activeItems.map((item) => {
-            const brand = (item.companyName || "").toLowerCase();
-            if (brand.includes("ford")) return { ...item, logo: fordLogo };
-            if (brand.includes("disney") || brand.includes("disnep")) return { ...item, logo: disneyLogo };
-            return item;
-          });
-          setItems(withLogos);
+          setItems(
+            activeItems.map((c) => ({
+              _id: c._id,
+              testimonialTitle: c.title || c.testimonialTitle || "",
+              review: c.description || c.review || "",
+              companyName: c.companyName || "",
+            }))
+          );
         } else {
           setItems(fallbackTestimonials);
         }
@@ -279,7 +285,7 @@ const Testimonials = () => {
                   height: 32,
                 }}
               >
-                Testimonials
+                {section?.badgeText || "Testimonials"}
               </span>
             </div>
             {/* Heading */}
@@ -295,7 +301,7 @@ const Testimonials = () => {
                 height: 25,
               }}
             >
-              What They Are Saying
+              {section?.sectionTitle || "What They Are Saying"}
             </h2>
           </div>
 
@@ -314,7 +320,7 @@ const Testimonials = () => {
                 alignItems: "flex-end",
               }}
             >
-              Discover the stories and experiences of individuals and companies who have found success and excellence through Applyfier
+              {section?.sectionDescription || "Discover the stories and experiences of individuals and companies who have found success and excellence through Applyfier"}
             </p>
             {/* Frame 842 - Nav buttons */}
             <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10, width: 91.93, height: 40.97, flexShrink: 0 }}>

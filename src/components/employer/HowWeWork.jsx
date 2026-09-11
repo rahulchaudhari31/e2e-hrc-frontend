@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getEmployerHowWeWorkSteps } from "../../services/employer/howWeWorkService";
+import { getEmployerHowWeWorkSection } from "../../services/employer/employerHowWeWorkSectionService";
 
 function HowWeWorkSkeleton() {
   return (
@@ -39,14 +40,27 @@ function HowWeWorkFallback({ message = "The How We Work section is currently una
 
 export default function HowWeWork() {
   const [steps, setSteps] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-
-  const staticSection = {
+  const [section, setSection] = useState({
     badgeText: "HOW WE WORK",
     sectionTitle: "How We Work",
     sectionDescription: "",
-  };
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    getEmployerHowWeWorkSection().then((data) => {
+      if (isMounted && data) {
+        setSection({
+          badgeText: data.badgeText || "HOW WE WORK",
+          sectionTitle: data.sectionTitle || "How We Work",
+          sectionDescription: data.sectionDescription || "",
+        });
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     const loadSteps = async () => {
@@ -77,12 +91,12 @@ export default function HowWeWork() {
   return (
     <section className="relative w-full bg-[linear-gradient(135deg,#F0D7A4_0%,#E9C65C_25%,#D8AE32_50%,#F4E4C3_75%,#F7F3EA_100%)] py-16 px-6 md:px-16 overflow-hidden">
       <div className="relative z-10 text-center mb-14">
-        {staticSection.badgeText && (
-          <p className="text-gray-700 tracking-widest text-sm font-semibold mb-2">{staticSection.badgeText}</p>
+        {section.badgeText && (
+          <p className="text-gray-700 tracking-widest text-sm font-semibold mb-2">{section.badgeText}</p>
         )}
-        <h2 className="text-3xl md:text-4xl font-extrabold text-brand-navy">{staticSection.sectionTitle}</h2>
-        {staticSection.sectionDescription && (
-          <p className="mx-auto mt-4 max-w-3xl text-base md:text-lg text-gray-700">{staticSection.sectionDescription}</p>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-brand-navy">{section.sectionTitle}</h2>
+        {section.sectionDescription && (
+          <p className="mx-auto mt-4 max-w-3xl text-base md:text-lg text-gray-700">{section.sectionDescription}</p>
         )}
       </div>
 
