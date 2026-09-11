@@ -134,6 +134,7 @@ function Sectors() {
           >
             {services.map((service, index) => {
               const name = service.name || service.title;
+              const description = service.shortDescription || service.description || "Tailored recruitment solutions for this sector.";
               const image = service.image || fallbackIndustries[index % fallbackIndustries.length]?.image;
 
               return (
@@ -154,6 +155,9 @@ function Sectors() {
                   )}
                   <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(0, 15, 40, 0.9) 30%, rgba(0, 15, 40, 0.35) 100%)" }} />
                   <div className="absolute left-0 top-0 w-[280px] h-[420px] flex flex-col justify-end items-start p-7">
+                    <div className="w-[224px] max-h-[220px] mb-3 overflow-hidden opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out">
+                      <p className="text-white/95 font-body text-[13px] leading-[20px]">{description}</p>
+                    </div>
                     <div className="w-[224px] pb-2">
                       <h3 className="font-heading font-bold text-[20px] leading-[28px] text-white">{name}</h3>
                     </div>
