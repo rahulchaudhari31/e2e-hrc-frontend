@@ -186,12 +186,22 @@ function Process() {
               <div style={{ width: 160, height: 160, position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div
                   style={{
-                    width: 160, height: 160, borderRadius: "50%",
-                    border: "1.6px dashed rgba(0,92,185,0.2)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    position: "absolute", zIndex: 0,
+                    position: "absolute", inset: 0,
+                    animation: "e2e-orbit 14s linear infinite",
                   }}
-                />
+                >
+                  <div
+                    style={{
+                      width: 160, height: 160, borderRadius: "50%",
+                      border: "1.6px dashed rgba(0,92,185,0.2)",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                  <span style={{ position: "absolute", top: 0, left: "48%", width: "4%", height: 8, background: "#F5A300" }} />
+                  <span style={{ position: "absolute", bottom: 0, left: "48%", width: "4%", height: 8, background: "#F5A300" }} />
+                  <span style={{ position: "absolute", left: 0, top: "48%", width: 8, height: "4%", background: "#C8D96F" }} />
+                  <span style={{ position: "absolute", right: 0, top: "48%", width: 8, height: "4%", background: "#C8D96F" }} />
+                </div>
                 <div
                   style={{
                     width: 112, height: 112, borderRadius: "50%",
@@ -209,10 +219,6 @@ function Process() {
                     <span className="font-heading font-[800]" style={{ fontSize: 20, lineHeight: "28px", color: "#FFFFFF" }}>E2E</span>
                   </div>
                 </div>
-                <span style={{ position: "absolute", top: 0, left: "48%", width: "4%", height: 8, background: "#F5A300" }} />
-                <span style={{ position: "absolute", bottom: 0, left: "48%", width: "4%", height: 8, background: "#F5A300" }} />
-                <span style={{ position: "absolute", left: 0, top: "48%", width: 8, height: "4%", background: "#C8D96F" }} />
-                <span style={{ position: "absolute", right: 0, top: "48%", width: 8, height: "4%", background: "#C8D96F" }} />
               </div>
               <div style={{ paddingTop: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 0 }}>
                 <span className="font-body font-semibold" style={{ fontSize: 12, lineHeight: "16px", textAlign: "center", color: "#64748B" }}>Connecting</span>
@@ -260,6 +266,16 @@ function Process() {
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes e2e-orbit {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="e2e-orbit"] { animation: none !important; }
+        }
+      `}</style>
     </section>
   );
 }
