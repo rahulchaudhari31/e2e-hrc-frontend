@@ -3,6 +3,10 @@
     {
       "source": "/api/(.*)",
       "destination": "https://e2e-hrc-backend.onrender.com/api/$1"
+    },
+    {
+      "source": "/((?!assets/|.*\\.).*)",
+      "destination": "/index.html"
     }
   ]
 }
