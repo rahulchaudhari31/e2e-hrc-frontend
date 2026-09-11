@@ -74,6 +74,54 @@ function HeroFallback() {
   );
 }
 
+const DEFAULT_STATS = [
+  { label: "CLIENTS", value: "100+" },
+  { label: "CANDIDATES", value: "100+" },
+  { label: "YEARS OF EXPERIENCE", value: "25+" },
+  { label: "OFFICES", value: "4" },
+];
+
+const parseStatValue = (raw) => {
+  const str = String(raw ?? "").trim();
+  const match = str.match(/^([\d]+(?:\.[\d]+)?)(.*)$/);
+  if (!match) return { num: 0, suffix: str || "+" };
+  const num = parseFloat(match[1]);
+  return { num: Number.isFinite(num) ? num : 0, suffix: match[2] };
+};
+
+const buildTitle = (title, highlight) => {
+  const t = title?.trim() || "Connecting Talent. Building Futures.";
+  const h = highlight?.trim();
+  if (!h) {
+    return { firstLine: t, secondLine: null };
+  }
+
+  const idx = t.indexOf(h);
+  if (idx === -1) {
+    return { firstLine: t, secondLine: null };
+  }
+
+  const before = t.slice(0, idx);
+  const mid = t.slice(idx, idx + h.length);
+  const rest = t.slice(idx + h.length);
+
+  let boundary = -1;
+  for (const sep of [". ", "; ", ": ", "/ "]) {
+    const i = before.lastIndexOf(sep);
+    if (i > boundary) boundary = i;
+  }
+  if (boundary === -1) boundary = before.lastIndexOf(" ");
+
+  if (boundary >= 0) {
+    return {
+      firstLine: before.slice(0, boundary + 1),
+      secondLine: { pre: before.slice(boundary + 1), mid, rest },
+    };
+  }
+
+  return { firstLine: before, secondLine: { pre: "", mid, rest } };
+};
+
 function AnimatedStat({ target, suffix = "+", label, containerWidth, duration = 1500, delay = 0 }) {
   const { count, done } = useCountUp(target, duration, delay);
   const [visible, setVisible] = useState(false);
@@ -142,6 +190,21 @@ function Hero() {
 
   const imageSrc = heroData.heroImage || heroImgPlaceholder;
 
+  const badgeText = heroData.subtitle || "Connecting Talent. Building Futures.";
+  const { firstLine, secondLine } = buildTitle(heroData.title, heroData.highlightedText);
+  const description =
+    heroData.description ||
+    "Helping UK employers find exceptional talent and helping candidates discover opportunities to grow and thrive in their careers.";
+  const buttonText = heroData.buttonText || "Hire Talent";
+
+  const rawStats = Array.isArray(heroData.stats) && heroData.stats.length > 0
+    ? heroData.stats
+    : DEFAULT_STATS;
+  const displayStats = rawStats.map((stat) => ({
+    ...stat,
+    parsed: parseStatValue(stat.value),
+  }));
+
   return (
     <section className="relative" style={{ width: "100%", maxWidth: "1440px", height: "638px", margin: "0 auto", padding: "2px 53.5px 79px", boxSizing: "border-box", zIndex: 2 }}>
 
@@ -175,41 +238,47 @@ function Hero() {
           {/* Badge */}
           <div style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: "4px 12px", gap: "6px", width: "291.94px", height: "24px", background: "#C9DB82", borderRadius: "9999px", flex: "none", order: 0 }}>
             <div style={{ width: "12px", height: "12px", borderRadius: "9999px", background: "#166534", flex: "none", order: 0 }} />
-            <span style={{ fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 600, fontSize: "12px", lineHeight: "16px", color: "#166534", flex: "none", order: 1 }}>
-              Connecting Talent. Building Futures.
+            <span style={{ fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 600, fontSize: "12px", lineHeight: "16px", color: "#166534", flex: "none", order: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {badgeText}
             </span>
           </div>
 
           {/* Heading */}
           <div style={{ width: "632px", display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "0px", flex: "none", order: 1 }}>
-            <h1 style={{ margin: 0, fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 800, fontSize: "60px", lineHeight: "60px", letterSpacing: "0px", color: "#004CA5", width: "632px", height: "120px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", flex: "none", order: 0, alignSelf: "stretch", flexGrow: 0 }}>
-              <span>Connecting Talent.</span>
-              <span>Building <span style={{ color: "#F39308" }}>Futures.</span></span>
+            <h1 style={{ margin: 0, fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 800, fontSize: "60px", lineHeight: "60px", letterSpacing: "-1px", color: "#004CA5", width: "632px", height: "120px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", flex: "none", order: 0, alignSelf: "stretch", flexGrow: 0 }}>
+              <span>{firstLine}</span>
+              {secondLine && (
+                <span>
+                  {secondLine.pre}
+                  {secondLine.mid && <span style={{ color: "#F39308" }}>{secondLine.mid}</span>}
+                  {secondLine.rest}
+                </span>
+              )}
             </h1>
           </div>
 
           {/* Description */}
           <div style={{ width: "632px", height: "88px", display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "0px", flex: "none", order: 2 }}>
-            <p style={{ margin: 0, fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 400, fontSize: "18px", lineHeight: "29px", color: "#000000", width: "514px", height: "88px" }}>
-              Helping UK employers find exceptional talent and helping candidates discover opportunities to grow and thrive in their careers.
+            <p style={{ margin: 0, fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 400, fontSize: "18px", lineHeight: "29px", color: "#000000", maxWidth: "514px" }}>
+              {description}
             </p>
           </div>
 
           {/* CTA Buttons */}
-          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", padding: "8px 0px", gap: "16px", width: "632px", height: "68px", flex: "none", order: 3 }}>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", padding: "8px 0px", gap: "16px", width: "632px", flex: "none", order: 3 }}>
             <a
               href={heroData.buttonLink || "#"}
               style={{
                 display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
                 padding: "12px 32px 12px 28px", gap: "8px",
-                width: "200px", height: "52px",
+                minWidth: "200px",
                 background: "#F39308", borderRadius: "9999px",
                 fontFamily: "Inter, sans-serif", fontStyle: "normal", fontWeight: 600,
                 fontSize: "16px", lineHeight: "24px", color: "#FFFFFF",
                 textDecoration: "none",
               }}
             >
-              Hire Talent
+              {buttonText}
               <span style={{ marginLeft: "4px" }}>→</span>
             </a>
             <button
@@ -240,12 +309,19 @@ function Hero() {
           </div>
 
           {/* Stats */}
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0px 3px 8px", gap: "10px", width: "632px", height: "95px", borderTop: "1px solid #F3F4F6", flex: "none", order: 4, boxSizing: "border-box" }}>
-            <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", padding: "0px", gap: "24px", width: "576.25px", height: "70px" }}>
-              <AnimatedStat target={100} suffix="+" label="CLIENTS" containerWidth="96px" duration={800} delay={100} />
-              <AnimatedStat target={100} suffix="+" label="CANDIDATES" containerWidth="131px" duration={800} delay={250} />
-              <AnimatedStat target={25} suffix="+" label="YEARS OF EXPERIENCE" containerWidth="138.62px" duration={800} delay={400} />
-              <AnimatedStat target={4} suffix="" label="OFFICES" containerWidth="138.62px" duration={800} delay={550} />
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0px 3px 8px", gap: "10px", width: "632px", borderTop: "1px solid #F3F4F6", flex: "none", order: 4, boxSizing: "border-box" }}>
+            <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", alignItems: "flex-start", padding: "0px", gap: "24px", minHeight: "70px" }}>
+              {displayStats.map((stat, index) => (
+                <AnimatedStat
+                  key={`${stat.label}-${index}`}
+                  target={stat.parsed.num}
+                  suffix={stat.parsed.suffix}
+                  label={String(stat.label || "").toUpperCase()}
+                  containerWidth={Math.min(Math.max(96, String(stat.label || "").length * 7 + 42), 140)}
+                  duration={800}
+                  delay={100 + index * 150}
+                />
+              ))}
             </div>
           </div>
 
