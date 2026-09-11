@@ -10,6 +10,8 @@ const Employee = lazy(() => import("../pages/employee"));
 const Becomepartner = lazy(()=>import("../pages/BecomePartner"))
 const Blogs = lazy (()=>import("../pages/Blogs"))
 const Contact = lazy(()=>import("../pages/ContactUs"))
+const SubmitVacancy = lazy(()=>import("../pages/SubmitVacancy"))
+const SubmitCv = lazy(()=>import("../pages/SubmitCv"))
 
 const Approuter = () => {
   return (
@@ -23,6 +25,8 @@ const Approuter = () => {
         <Route path="/Become-partner" element={<Becomepartner />} />
          <Route path="/blogs" element={<Blogs />} />
          <Route path="/contact" element={<Contact />} />
+         <Route path="/submit-vacancy" element={<SubmitVacancy />} />
+         <Route path="/submit-cv" element={<SubmitCv />} />
       </Routes>
     </Suspense>
 

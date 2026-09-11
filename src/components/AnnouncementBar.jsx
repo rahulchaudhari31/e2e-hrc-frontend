@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTwitter } from 'react-icons/fa';
 
@@ -40,10 +41,10 @@ export default function AnnouncementBar() {
       `}</style>
       <div className="ann-bar">
         <div className="ann-bar-inner">
-          <a href="#" className="ann-link">
+          <Link to="/submit-vacancy" className="ann-link">
             Looking to hire exceptional talent? Submit a Vacancy
             <FiArrowRight size={16} aria-hidden="true" />
-          </a>
+          </Link>
           <div className="ann-social">
             {socialLinks.map(({ label, href, Icon }) => (
               <a key={label} href={href} aria-label={label}>

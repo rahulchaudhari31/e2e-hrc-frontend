@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Check, Phone, Mail, User, Paperclip, ChevronDown, ArrowRight, Search } from "lucide-react";
 import { getContactCta } from "../../services/contactCtaService";
 import { toast } from "react-toastify";
@@ -375,19 +376,19 @@ const ContactSection = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            <button
-              type="button"
+            <Link
+              to="/submit-vacancy"
               className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 transition-colors text-[#0b3a91] font-semibold px-6 py-3 rounded-full"
             >
               {button1Text}
               <ArrowRight className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              to="/submit-cv"
               className="inline-flex items-center gap-2 bg-transparent border border-white/40 hover:border-white transition-colors text-white font-semibold px-6 py-3 rounded-full"
             >
               {button2Text}
-            </button>
+            </Link>
           </div>
         </div>
 

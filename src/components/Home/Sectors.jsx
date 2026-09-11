@@ -11,10 +11,10 @@ import financeImg from "../../assets/images/sectors/finance.jpg";
 import educationImg from "../../assets/images/sectors/education.jpg";
 
 const fallbackIndustries = [
-  { name: "Manufacturing", image: manufacturingImg, description: "Tailored recruitment solutions for this sector." },
-  { name: "Healthcare", image: healthcareImg, description: "Tailored recruitment solutions for this sector." },
-  { name: "Engineering", image: engineeringImg, description: "Tailored recruitment solutions for this sector." },
-  { name: "Construction", image: constructionImg, description: "Tailored recruitment solutions for this sector." },
+  { name: "Manufacturing", image: manufacturingImg, description: "The manufacturing industry constantly needs production operatives, maintenance engineers, quality specialists, and shift supervisors." },
+  { name: "Healthcare", image: healthcareImg, description: "We strengthen the foundation of the industry with roles in nursing, allied health services, care management, and clinical and non-clinical support." },
+  { name: "Engineering", image: engineeringImg, description: "We provide qualified engineers across civil, mechanical, electrical, and industrial disciplines. Our recruitment expertise helps organizations build strong technical teams for complex projects." },
+  { name: "Construction", image: constructionImg, description: "Our teams are equipped to identify the requirements of the construction business and recruit site managers, skilled workers, quantity surveyors, and project professionals." },
   { name: "Logistics", image: logisticsImg, description: "Tailored recruitment solutions for this sector." },
   { name: "Finance", image: financeImg, description: "Tailored recruitment solutions for this sector." },
   { name: "Education", image: educationImg, description: "Tailored recruitment solutions for this sector." },
@@ -156,7 +156,7 @@ function Sectors() {
                   <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(0, 15, 40, 0.9) 30%, rgba(0, 15, 40, 0.35) 100%)" }} />
                   <div className="absolute left-0 top-0 w-[280px] h-[420px] flex flex-col justify-end items-start p-7">
                     <div className="w-[224px] max-h-[220px] mb-3 overflow-hidden opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out">
-                      <p className="text-white/95 font-body text-[13px] leading-[20px]">{description}</p>
+                      <p className="text-white/95 font-body font-bold text-[13px] leading-[22px]" dangerouslySetInnerHTML={{ __html: description }} />
                     </div>
                     <div className="w-[224px] pb-2">
                       <h3 className="font-heading font-bold text-[20px] leading-[28px] text-white">{name}</h3>

@@ -1,6 +1,7 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import ContactFormCard from '../components/Home/ContactFormCard';
+import VacancySubmissionForm from '../components/Submit/VacancySubmissionForm';
+import CvSubmissionForm from '../components/Submit/CvSubmissionForm';
 
 const CONTENT = {
   employee: {
@@ -23,13 +24,14 @@ const CONTENT = {
 
 export default function SubmitForm({ variant = 'employee' }) {
   const cfg = CONTENT[variant] || CONTENT.employee;
+  const Form = variant === 'employer' ? VacancySubmissionForm : CvSubmissionForm;
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <Navbar />
       <section className="relative w-full bg-[#0b3a91] py-16 px-4 sm:px-6 lg:px-12 overflow-hidden mt-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="text-white">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          <div className="text-white lg:sticky lg:top-28">
             <span className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-medium px-4 py-1.5 rounded-full mb-6">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
               {cfg.badge}
@@ -56,7 +58,7 @@ export default function SubmitForm({ variant = 'employee' }) {
             </div>
           </div>
 
-          <ContactFormCard type={variant} />
+          <Form />
         </div>
       </section>
       <Footer />

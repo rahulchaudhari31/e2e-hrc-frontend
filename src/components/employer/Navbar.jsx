@@ -1,15 +1,16 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Linkedin, Twitter, Facebook, Instagram, ArrowRight } from "lucide-react";
 
 const navLinks = [
-  { label: "Home", href: "#" },
-  { label: "About Us", href: "#" },
-  { label: "Employer", href: "#", active: true },
-  { label: "Employee", href: "#" },
-  { label: "Workforce Solutions", href: "#" },
-  { label: "Become a Partner", href: "#" },
-  { label: "Blogs", href: "#" },
-  { label: "Contact Us", href: "#" },
+  { label: "Home", href: "/" },
+  { label: "About Us", href: "/about" },
+  { label: "Employer", href: "/employer", active: true },
+  { label: "Employee", href: "/employee" },
+  { label: "Workforce Solutions", href: "/workforce-solutions" },
+  { label: "Become a Partner", href: "/Become-partner" },
+  { label: "Blogs", href: "/blogs" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -18,10 +19,10 @@ export default function Navbar() {
       {/* Top announcement bar */}
       <div className="bg-brand-black text-white text-sm py-2 px-4 flex items-center justify-between">
         <div className="flex-1 text-center">
-          <a href="#vacancy" className="text-brand-orange hover:underline inline-flex items-center gap-1">
+          <Link to="/submit-vacancy" className="text-brand-orange hover:underline inline-flex items-center gap-1">
             Looking to hire exceptional talent? Submit a Vacancy
             <ArrowRight size={14} />
-          </a>
+          </Link>
         </div>
         <div className="hidden md:flex items-center gap-3 pr-2">
           <Linkedin size={14} className="cursor-pointer hover:text-brand-orange" />
@@ -45,9 +46,9 @@ export default function Navbar() {
 
         <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-gray-700">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
-              href={link.href}
+              to={link.href}
               className={
                 link.active
                   ? "text-brand-orange font-semibold"
@@ -55,7 +56,7 @@ export default function Navbar() {
               }
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
